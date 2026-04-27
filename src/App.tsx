@@ -110,7 +110,7 @@ const TestimonialCard = ({ name, quote, role, image, delay }: { name: string, qu
     <div className="flex gap-1 text-blue-500">
       {[1,2,3,4,5].map(i => <Star key={i} size={14} fill="currentColor" />)}
     </div>
-    <p className="text-slate-600 italic leading-relaxed font-medium">"{quote}"</p>
+    <p className="text-slate-600 dark:text-slate-300 italic leading-relaxed font-medium">"{quote}"</p>
     
     <div className="flex items-center justify-between mt-auto">
       <div className="flex items-center gap-4 group/author">
@@ -251,7 +251,7 @@ const FAQItem = ({ question, answer }: { question: string, answer: string, key?:
             className="overflow-hidden"
           >
             <div className="pb-6 px-4">
-              <p className="text-slate-500 font-medium leading-relaxed">{answer}</p>
+              <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed">{answer}</p>
             </div>
           </motion.div>
         )}
@@ -470,7 +470,7 @@ const PricingCard = ({ tier, delay }: { tier: typeof pricingTiers[0], delay: num
       <span className="text-5xl font-black tracking-tighter leading-none">{tier.price}</span>
       <span className="text-sm font-bold opacity-60 ml-1">/mo</span>
     </div>
-    <p className={`text-sm font-medium mb-8 leading-relaxed ${tier.highlight ? 'text-blue-50/80' : 'text-slate-500'}`}>{tier.description}</p>
+    <p className={`text-sm font-medium mb-8 leading-relaxed ${tier.highlight ? 'text-blue-50/80' : 'text-slate-600 dark:text-slate-400'}`}>{tier.description}</p>
     <div className="space-y-4 mb-10 flex-1">
       {tier.features.map((feature, i) => (
         <div key={i} className="flex items-center gap-3">
@@ -495,8 +495,8 @@ const ContactSection = () => (
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-600 text-[9px] font-black tracking-widest uppercase text-white mb-6 rounded-full">
             <MessageCircle size={12} /> Communication Node
           </div>
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 leading-[0.9] uppercase mb-8">INITIALIZE <br/>CONTACT.</h2>
-          <p className="text-slate-500 font-medium leading-relaxed max-w-sm mb-12">
+          <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 dark:text-white leading-[0.9] uppercase mb-8">INITIALIZE <br/>CONTACT.</h2>
+          <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed max-w-sm mb-12">
             Speak directly with Mr Man to discuss your biometric status and transformation roadmap.
           </p>
           <div className="space-y-8">
@@ -749,7 +749,7 @@ export default function App() {
                 BOUNDARY.
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-xl mb-12 leading-relaxed font-medium">
+            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-xl mb-12 leading-relaxed font-medium">
               A scientific approach to peak human condition by Mr Man Fitness. Based in Nakuru, designed for those who demand excellence in every fiber of their being.
             </p>
             <div className="flex flex-col sm:flex-row gap-5">
@@ -818,7 +818,7 @@ export default function App() {
                 <Dumbbell size={12} /> Service Matrix
               </div>
               <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 dark:text-white leading-[0.9] uppercase mb-8">ELITE<br/>PROGRAMS.</h2>
-              <p className="text-slate-500 dark:text-slate-400 font-medium">A diverse range of physical engineering protocols specialized for human optimization at any level.</p>
+              <p className="text-slate-600 dark:text-slate-400 font-medium">A diverse range of physical engineering protocols specialized for human optimization at any level.</p>
             </div>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -850,7 +850,7 @@ export default function App() {
                Value Assessment
             </div>
             <h2 className="text-5xl md:text-[6rem] font-black tracking-tighter text-slate-900 dark:text-white leading-none uppercase mb-6">INVEST IN YOUR <br/>SYSTEM.</h2>
-            <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xl mx-auto">Transparent tiers designed to match your commitment level and performance goals.</p>
+            <p className="text-slate-600 dark:text-slate-400 font-medium max-w-xl mx-auto">Transparent tiers designed to match your commitment level and performance goals.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {pricingTiers.map((tier, i) => (
@@ -864,7 +864,7 @@ export default function App() {
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-4 uppercase">The Studio.</h2>
-              <p className="text-slate-500 font-medium">A sanctuary of focus and high-performance equipment in the heart of Milimani, Nakuru.</p>
+              <p className="text-slate-600 font-medium">A sanctuary of focus and high-performance equipment in the heart of Milimani, Nakuru.</p>
             </div>
             <button className="text-xs font-black tracking-widest text-blue-600 bg-blue-50 px-8 py-4 rounded-xl border border-blue-100 uppercase hover:bg-blue-100 transition-colors">View All Spaces</button>
           </div>
@@ -911,7 +911,7 @@ export default function App() {
                     <Activity size={12} /> Live Biometrics
                   </div>
                   <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 leading-[0.9] mb-6">INTELLIGENCE <br/>DASHBOARD.</h2>
-                  <p className="text-slate-500 font-medium leading-relaxed">
+                  <p className="text-slate-600 font-medium leading-relaxed">
                     Access your clinical-grade performance data. Track every micro-progress of your transformation engine through Mr Man's proprietary monitoring.
                   </p>
                 </div>
@@ -1067,7 +1067,7 @@ export default function App() {
               </div>
               <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 leading-[0.9]">TRANSFORMATIONS.</h2>
             </div>
-            <p className="max-w-xs text-slate-500 font-medium text-sm leading-relaxed text-right">
+            <p className="max-w-xs text-slate-600 font-medium text-sm leading-relaxed text-right">
               Witness the physical manifestation of discipline. Real results, engineered for Nakuru's high-performance clients.
             </p>
           </div>
@@ -1137,7 +1137,7 @@ export default function App() {
                 <User size={12} /> The Architecture
               </div>
               <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 leading-[0.9] uppercase mb-8">OUR PHILOSOPHY.</h2>
-              <div className="space-y-6 text-slate-500 font-medium leading-relaxed">
+              <div className="space-y-6 text-slate-600 font-medium leading-relaxed">
                 <p>
                   At Mr Man Fitness, we believe the body is the ultimate piece of hardware. Our mission is to "re-engineer" human capability using a clinical approach—relying on high-resolution data, metabolic thresholds, and hypoxic conditioning.
                 </p>
@@ -1252,7 +1252,7 @@ export default function App() {
                 <ChevronDown size={12} /> Optimization Intel
               </div>
               <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 leading-[0.9] uppercase mb-8">FREQUENTLY <br/>QUESTIONED.</h2>
-              <p className="text-slate-500 font-medium max-w-sm">Everything you need to know about starting your physical evolution program at our Nakuru base.</p>
+              <p className="text-slate-600 font-medium max-w-sm">Everything you need to know about starting your physical evolution program at our Nakuru base.</p>
             </div>
             <div className="liquid-glass border-slate-50 p-8 md:p-12 rounded-3xl shadow-xl shadow-blue-900/5 dark:border-white/5">
               {[
