@@ -38,9 +38,7 @@ import {
   Play,
   ChevronDown,
   Plus,
-  Minus,
-  Sun,
-  Moon
+  Minus
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -67,8 +65,8 @@ const DashboardMetric = ({ label, value, trend, unit }: { label: string, value: 
   <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group cursor-default">
     <p className="text-[10px] font-black text-blue-500/80 group-hover:text-blue-500 uppercase tracking-widest mb-2 transition-colors">{label}</p>
     <div className="flex items-end gap-2">
-      <span className="text-3xl font-black text-slate-800 dark:text-white leading-none tracking-tighter">{value}</span>
-      <span className="text-xs font-bold text-slate-400 mb-1 group-hover:text-slate-500 dark:group-hover:text-slate-300 transition-colors">{unit}</span>
+      <span className="text-3xl font-black text-slate-800 leading-none tracking-tighter">{value}</span>
+      <span className="text-xs font-bold text-slate-400 mb-1 group-hover:text-slate-500 transition-colors">{unit}</span>
     </div>
     <div className="mt-4 flex items-center gap-1 text-[10px] font-black text-emerald-500">
       <ArrowUpRight size={12} /> {trend}
@@ -88,8 +86,8 @@ const FeatureCard = ({ icon: Icon, title, description, delay }: { icon: any, tit
     <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600 group-hover:scale-110 group-focus:scale-110 transition-transform shadow-inner shadow-white/50">
       <Icon size={24} />
     </div>
-    <h3 className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{title}</h3>
-    <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm">{description}</p>
+    <h3 className="text-xl font-bold tracking-tight text-slate-800 group-hover:text-blue-700 transition-colors">{title}</h3>
+    <p className="text-slate-500 leading-relaxed text-sm">{description}</p>
     <div className="mt-auto pt-4 flex items-center gap-2 text-[10px] font-black text-blue-500 group-hover:text-blue-700 transition-colors uppercase tracking-[0.2em]">
       EXPLORE PROGRAM <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
     </div>
@@ -110,7 +108,7 @@ const TestimonialCard = ({ name, quote, role, image, delay }: { name: string, qu
     <div className="flex gap-1 text-blue-500">
       {[1,2,3,4,5].map(i => <Star key={i} size={14} fill="currentColor" />)}
     </div>
-    <p className="text-slate-600 dark:text-slate-300 italic leading-relaxed font-medium">"{quote}"</p>
+    <p className="text-slate-600 italic leading-relaxed font-medium">"{quote}"</p>
     
     <div className="flex items-center justify-between mt-auto">
       <div className="flex items-center gap-4 group/author">
@@ -251,7 +249,7 @@ const FAQItem = ({ question, answer }: { question: string, answer: string, key?:
             className="overflow-hidden"
           >
             <div className="pb-6 px-4">
-              <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed">{answer}</p>
+              <p className="text-slate-600 font-medium leading-relaxed">{answer}</p>
             </div>
           </motion.div>
         )}
@@ -274,9 +272,9 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-sm p-8 md:p-10 relative shadow-2xl overflow-hidden border dark:border-white/5"
+          className="bg-white rounded-2xl w-full max-w-sm p-8 md:p-10 relative shadow-2xl overflow-hidden"
         >
-          <button onClick={onClose} className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+          <button onClick={onClose} className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition-colors">
             <X size={20} />
           </button>
           
@@ -284,13 +282,13 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }
             <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-blue-600/20">
               <Zap size={24} fill="white" />
             </div>
-            <h3 className="text-2xl font-black tracking-tighter text-slate-800 dark:text-white uppercase">System Login</h3>
-            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase mt-1">Access Your Evolution Portal</p>
+            <h3 className="text-2xl font-black tracking-tighter text-slate-800 uppercase">System Login</h3>
+            <p className="text-xs font-bold text-slate-400 tracking-widest uppercase mt-1">Access Your Evolution Portal</p>
           </div>
 
           <div className="space-y-4">
             <button 
-              className="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold py-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-[0.98] shadow-sm"
+              className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 text-slate-700 font-bold py-4 rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98] shadow-sm"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -345,17 +343,17 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl p-10 md:p-12 relative shadow-2xl overflow-hidden border dark:border-white/5"
+            className="bg-white rounded-2xl w-full max-w-xl p-10 md:p-12 relative shadow-2xl overflow-hidden"
           >
-            <button onClick={onClose} className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+            <button onClick={onClose} className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 transition-colors">
               <X size={24} />
             </button>
 
             {step === 1 ? (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <h2 className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white mb-2 uppercase">Book Consult.</h2>
-                  <p className="text-slate-500 dark:text-slate-400 font-medium">Engineer your transformation with Mr Man.</p>
+                  <h2 className="text-4xl font-black tracking-tighter text-slate-900 mb-2 uppercase">Book Consult.</h2>
+                  <p className="text-slate-500 font-medium">Engineer your transformation with Mr Man.</p>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -470,7 +468,7 @@ const PricingCard = ({ tier, delay }: { tier: typeof pricingTiers[0], delay: num
       <span className="text-5xl font-black tracking-tighter leading-none">{tier.price}</span>
       <span className="text-sm font-bold opacity-60 ml-1">/mo</span>
     </div>
-    <p className={`text-sm font-medium mb-8 leading-relaxed ${tier.highlight ? 'text-blue-50/80' : 'text-slate-600 dark:text-slate-400'}`}>{tier.description}</p>
+    <p className={`text-sm font-medium mb-8 leading-relaxed ${tier.highlight ? 'text-blue-50/80' : 'text-slate-600'}`}>{tier.description}</p>
     <div className="space-y-4 mb-10 flex-1">
       {tier.features.map((feature, i) => (
         <div key={i} className="flex items-center gap-3">
@@ -495,8 +493,8 @@ const ContactSection = () => (
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-600 text-[9px] font-black tracking-widest uppercase text-white mb-6 rounded-full">
             <MessageCircle size={12} /> Communication Node
           </div>
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 dark:text-white leading-[0.9] uppercase mb-8">INITIALIZE <br/>CONTACT.</h2>
-          <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed max-w-sm mb-12">
+          <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 leading-[0.9] uppercase mb-8">INITIALIZE <br/>CONTACT.</h2>
+          <p className="text-slate-600 font-medium leading-relaxed max-w-sm mb-12">
             Speak directly with Mr Man to discuss your biometric status and transformation roadmap.
           </p>
           <div className="space-y-8">
@@ -520,21 +518,21 @@ const ContactSection = () => (
             </div>
           </div>
         </div>
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-10 shadow-2xl shadow-blue-900/5">
+            <div className="bg-white rounded-3xl p-8 md:p-10 shadow-2xl shadow-blue-900/5">
           <form className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 dark:text-slate-500 pl-2">Vitals: Name</label>
-                <input required type="text" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-blue-500 transition-all font-bold text-slate-800 dark:text-white text-sm" placeholder="ID Name" />
+                <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 pl-2">Vitals: Name</label>
+                <input required type="text" className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-blue-500 transition-all font-bold text-slate-800 text-sm" placeholder="ID Name" />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 dark:text-slate-500 pl-2">Channel: Email</label>
-                <input required type="email" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-blue-500 transition-all font-bold text-slate-800 dark:text-white text-sm" placeholder="mail@example.com" />
+                <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 pl-2">Channel: Email</label>
+                <input required type="email" className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-blue-500 transition-all font-bold text-slate-800 text-sm" placeholder="mail@example.com" />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 dark:text-slate-500 pl-2">System Inquiry</label>
-              <textarea required rows={4} className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-blue-500 transition-all font-bold text-slate-800 dark:text-white text-sm resize-none" placeholder="Describe your performance goals..."></textarea>
+              <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 pl-2">System Inquiry</label>
+              <textarea required rows={4} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-blue-500 transition-all font-bold text-slate-800 text-sm resize-none" placeholder="Describe your performance goals..."></textarea>
             </div>
             <button className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl uppercase tracking-widest text-sm hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/20 active:scale-95">
               Submit Inquiry
@@ -548,19 +546,26 @@ const ContactSection = () => (
 );
 
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const containerRef = useRef(null);
 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const heroImages = [
+    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80"
+  ];
+
   useEffect(() => {
-    if (isDarkMode) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
-  }, [isDarkMode]);
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
@@ -639,13 +644,26 @@ export default function App() {
     <div className="relative min-h-screen selection:bg-blue-100 selection:text-blue-600" ref={containerRef}>
       {/* Background Elements */}
       <div className="fixed inset-0 mesh-gradient-light -z-10 opacity-60" />
-      <div className="fixed inset-0 bg-white/60 dark:bg-slate-950/60 -z-10" />
+      <div className="fixed inset-0 bg-white/60 -z-10" />
       
-      {/* Hero Background Image - Subtle Overlay with Parallax */}
-      <motion.div 
-        style={{ y: bgY, scale }}
-        className="fixed inset-0 -z-10 bg-[url('https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=2000')] bg-cover bg-center opacity-[0.04] mix-blend-multiply" 
-      />
+      {/* Hero Background Carousel - Subtle Overlay with Parallax */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={currentImageIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.04 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 2, ease: "easeInOut" }}
+            className="absolute inset-0 bg-cover bg-center mix-blend-multiply transition-transform duration-1000"
+            style={{ 
+              backgroundImage: `url('${heroImages[currentImageIndex]}')`,
+              y: bgY,
+              scale 
+            }}
+          />
+        </AnimatePresence>
+      </div>
 
       {/* Navigation */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl">
@@ -669,13 +687,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all focus:outline-none"
-              aria-label="Toggle Dark Mode"
-            >
-              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
             <button 
               onClick={() => setIsAuthModalOpen(true)}
               className="hidden md:block text-[10px] font-black text-slate-500 hover:text-blue-600 transition-colors uppercase tracking-widest px-4"
@@ -702,11 +713,11 @@ export default function App() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-x-0 top-0 pt-24 p-6 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl md:hidden shadow-2xl"
+            className="fixed inset-x-0 top-0 pt-24 p-6 z-40 bg-white/95 backdrop-blur-2xl md:hidden shadow-2xl"
           >
             <div className="flex flex-col gap-6">
               {['Programs', 'Transformation', 'Pricing', 'About', 'Contact'].map((item) => (
-                <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setIsMenuOpen(false)} className="text-4xl font-black tracking-tighter text-slate-800 dark:text-white">
+                <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setIsMenuOpen(false)} className="text-4xl font-black tracking-tighter text-slate-800">
                   {item}
                 </a>
               ))}
@@ -743,13 +754,13 @@ export default function App() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-[10px] font-black tracking-[0.2em] uppercase text-blue-600 mb-8 border border-blue-100 shadow-sm">
               <Sparkles size={14} /> MR MAN FITNESS • NAKURU ELITE
             </div>
-            <h1 className="text-5xl sm:text-7xl md:text-[6.5rem] font-black tracking-tighter leading-[0.85] mb-10 text-slate-900 dark:text-white">
+            <h1 className="text-5xl sm:text-7xl md:text-[6.5rem] font-black tracking-tighter leading-[0.85] mb-10 text-slate-900">
               REDEFINE YOUR <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">
                 BOUNDARY.
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-xl mb-12 leading-relaxed font-medium">
+            <p className="text-lg md:text-xl text-slate-600 max-w-xl mb-12 leading-relaxed font-medium">
               A scientific approach to peak human condition by Mr Man Fitness. Based in Nakuru, designed for those who demand excellence in every fiber of their being.
             </p>
             <div className="flex flex-col sm:flex-row gap-5">
@@ -767,7 +778,7 @@ export default function App() {
                 onClick={() => {
                   document.querySelector('#studio')?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="liquid-glass border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white px-10 py-5 rounded-2xl font-black transition-all"
+                className="liquid-glass border-slate-200 text-slate-800 px-10 py-5 rounded-2xl font-black transition-all"
               >
                 VIEW STUDIO
               </motion.button>
@@ -817,8 +828,8 @@ export default function App() {
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-[9px] font-black tracking-widest uppercase text-blue-600 mb-6 rounded-full border border-blue-100">
                 <Dumbbell size={12} /> Service Matrix
               </div>
-              <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 dark:text-white leading-[0.9] uppercase mb-8">ELITE<br/>PROGRAMS.</h2>
-              <p className="text-slate-600 dark:text-slate-400 font-medium">A diverse range of physical engineering protocols specialized for human optimization at any level.</p>
+              <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 leading-[0.9] uppercase mb-8">ELITE<br/>PROGRAMS.</h2>
+              <p className="text-slate-600 font-medium">A diverse range of physical engineering protocols specialized for human optimization at any level.</p>
             </div>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -849,8 +860,8 @@ export default function App() {
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 text-[9px] font-black tracking-widest uppercase text-slate-900 mb-6 rounded-full border border-slate-200">
                Value Assessment
             </div>
-            <h2 className="text-5xl md:text-[6rem] font-black tracking-tighter text-slate-900 dark:text-white leading-none uppercase mb-6">INVEST IN YOUR <br/>SYSTEM.</h2>
-            <p className="text-slate-600 dark:text-slate-400 font-medium max-w-xl mx-auto">Transparent tiers designed to match your commitment level and performance goals.</p>
+            <h2 className="text-5xl md:text-[6rem] font-black tracking-tighter text-slate-900 leading-none uppercase mb-6">INVEST IN YOUR <br/>SYSTEM.</h2>
+            <p className="text-slate-600 font-medium max-w-xl mx-auto">Transparent tiers designed to match your commitment level and performance goals.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {pricingTiers.map((tier, i) => (
@@ -1157,18 +1168,18 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="mt-12 pt-12 border-t border-slate-100 dark:border-slate-800">
-                <h4 className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight mb-8">THE SPECIALIST TEAM.</h4>
+              <div className="mt-12 pt-12 border-t border-slate-100">
+                <h4 className="font-black text-slate-800 uppercase tracking-tight mb-8">THE SPECIALIST TEAM.</h4>
                 <div className="flex flex-wrap gap-4">
                   {[
                     { name: "Dr. Sarah", role: "Bio-Nutrition" },
                     { name: "Coach Mike", role: "Force Output" },
                     { name: "Elena K.", role: "Neural Recovery" }
                   ].map(member => (
-                    <div key={member.name} className="flex items-center gap-3 liquid-glass px-4 py-2 rounded-full border-slate-100 dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group cursor-pointer shadow-sm hover:shadow-md">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 bg-[url('https://i.pravatar.cc/100')] bg-cover border border-white dark:border-slate-700 group-hover:border-blue-200 transition-colors" />
+                    <div key={member.name} className="flex items-center gap-3 liquid-glass px-4 py-2 rounded-full border-slate-100 hover:bg-blue-50 transition-colors group cursor-pointer shadow-sm hover:shadow-md">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 bg-[url('https://i.pravatar.cc/100')] bg-cover border border-white group-hover:border-blue-200 transition-colors" />
                       <div>
-                        <p className="text-[10px] font-black text-slate-800 dark:text-slate-100 leading-none mb-1 group-hover:text-blue-600 transition-colors">{member.name}</p>
+                        <p className="text-[10px] font-black text-slate-800 leading-none mb-1 group-hover:text-blue-600 transition-colors">{member.name}</p>
                         <p className="text-[8px] font-bold text-blue-400 group-hover:text-blue-500 uppercase tracking-widest leading-none transition-colors">{member.role}</p>
                       </div>
                     </div>
@@ -1232,9 +1243,9 @@ export default function App() {
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-900 text-[9px] font-black tracking-widest uppercase text-white mb-6 rounded-full">
                 <BookOpen size={12} /> Intelligence Base
               </div>
-              <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 dark:text-slate-100 leading-[0.9] uppercase">Performance Blog.</h2>
+              <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 leading-[0.9] uppercase">Performance Blog.</h2>
             </div>
-            <button className="text-xs font-black tracking-widest text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-8 py-4 rounded-xl border border-blue-100 dark:border-blue-800 uppercase hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-colors">Explorer Archive</button>
+            <button className="text-xs font-black tracking-widest text-blue-600 bg-blue-50 px-8 py-4 rounded-xl border border-blue-100 uppercase hover:bg-blue-100 transition-colors">Explorer Archive</button>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -1254,7 +1265,7 @@ export default function App() {
               <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 leading-[0.9] uppercase mb-8">FREQUENTLY <br/>QUESTIONED.</h2>
               <p className="text-slate-600 font-medium max-w-sm">Everything you need to know about starting your physical evolution program at our Nakuru base.</p>
             </div>
-            <div className="liquid-glass border-slate-50 p-8 md:p-12 rounded-3xl shadow-xl shadow-blue-900/5 dark:border-white/5">
+            <div className="liquid-glass border-slate-50 p-8 md:p-12 rounded-3xl shadow-xl shadow-blue-900/5">
               {[
                 { 
                   q: "How do I initiate my evolution?", 
