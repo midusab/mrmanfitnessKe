@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer components {
+  /* Apple Liquid Glass Utility - Light Mode Optimized */
+  .liquid-glass {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    transition: background 0.3s, border 0.3s;
+  }
+
+  .dark .liquid-glass {
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  .liquid-glass-blue {
+    background: rgba(59, 130, 246, 0.08);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 4px 24px -1px rgba(59, 130, 246, 0.1);
+    transition: background 0.3s, border 0.3s;
+  }
+
+  .dark .liquid-glass-blue {
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  .glass-dark {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Vibrant Mesh Gradient for Accents */
+  .mesh-gradient-light {
+    background: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.2) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(245, 158, 11, 0.1) 0px, transparent 50%);
+    transition: opacity 0.5s;
+  }
+
+  .dark .mesh-gradient-light {
+    background: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%);
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-white text-slate-900 antialiased font-sans transition-colors duration-500 overflow-x-hidden;
+  }
+  body.dark {
+    @apply bg-slate-950 text-slate-100;
+  }
+}
