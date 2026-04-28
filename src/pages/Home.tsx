@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { useModal } from '../context/ModalContext';
+import { supabase } from '../lib/supabase';
 import { 
   Zap, 
   Target, 
@@ -173,7 +174,7 @@ export default function HomePage() {
     }
   ];
 
-  const blogPosts = [
+  const [blogPosts] = useState([
     {
       title: "Optimizing Hypoxic Training at 1,800m Altitude",
       category: "Science",
@@ -192,7 +193,32 @@ export default function HomePage() {
       date: "Apr 08, 2026",
       image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800"
     }
-  ];
+  ]);
+
+  const [realTestimonials, setRealTestimonials] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('testimonials')
+          .select('*')
+          .lte('created_at', new Date().toISOString())
+          .order('created_at', { ascending: false })
+          .limit(6);
+
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setRealTestimonials(data);
+        }
+      } catch (e) {
+        console.error("Testimonials fetch error:", e);
+      }
+    };
+    fetchTestimonials();
+  }, []);
+
+  const activeTestimonials = realTestimonials.length > 0 ? realTestimonials : testimonials;
 
   return (
     <div ref={containerRef}>
@@ -357,7 +383,7 @@ export default function HomePage() {
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((t, i) => (
+            {activeTestimonials.map((t, i) => (
               <TestimonialCard key={i} {...t} delay={0.1 + (i * 0.1)} />
             ))}
           </div>

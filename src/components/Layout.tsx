@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useModal } from '../context/ModalContext';
+import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
+import { supabase } from '../lib/supabase';
 import { 
   Zap, 
   X, 
@@ -23,8 +26,23 @@ import {
 } from 'lucide-react';
 
 /* --- Shared Modals --- */
+
 const AuthModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
+  const { signIn } = useAuth();
+  const { notify } = useNotification();
   if (!isOpen) return null;
+
+  const handleSignIn = async () => {
+    try {
+      await signIn();
+      notify("Identity verified. Biological data synced.", "success");
+      onClose();
+    } catch (error) {
+      notify("Verification failed. Access denied.", "error");
+      console.error("Sign in failed", error);
+    }
+  };
+
   return (
     <AnimatePresence>
       <motion.div 
@@ -53,6 +71,7 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }
 
           <div className="space-y-4">
             <button 
+              onClick={handleSignIn}
               className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 text-slate-700 font-bold py-4 rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98] shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -84,7 +103,20 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }
 };
 
 const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
+  const { user, profile } = useAuth();
+  const { notify } = useNotification();
+  const { setIsAuthModalOpen } = useModal();
   const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    protocol: '',
+    duration: '',
+    date: ''
+  });
+  
   const nakuruLocations = ["Milimani", "Naka", "Shabaab", "Lanet", "Kiamunyi", "Freehold", "London", "Bondeni", "Mwariki", "Pipeline", "Section 58"];
   const programTypes = [
     { name: "Compound Lifts", icon: Dumbbell },
@@ -96,13 +128,41 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
   ];
   const durations = ["4 Weeks (Initiation)", "8 Weeks (Standard)", "12 Weeks (Transformation)", "Ongoing (Elite)"];
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStep(2);
-    setTimeout(() => {
-      onClose();
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    try {
+      setStep(2);
+      const { error } = await supabase.from('bookings').insert([{
+        user_id: user.id,
+        user_name: formData.name || profile?.display_name || user.user_metadata.full_name || user.email?.split('@')[0],
+        email: formData.email || user.email,
+        phone: formData.phone,
+        location: formData.location,
+        protocol: formData.protocol,
+        duration: formData.duration,
+        activation_date: new Date(formData.date).toISOString(),
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }]);
+
+      if (error) throw error;
+
+      notify("Protocol initialized. Confirmation following bio-analysis.", "protocol");
+
+      setTimeout(() => {
+        onClose();
+        setStep(1);
+      }, 4000);
+    } catch (error) {
+      console.error('Booking error:', error);
+      notify("Protocol initiation failed.", "error");
       setStep(1);
-    }, 4000);
+    }
   };
 
   const InputField = ({ label, icon: Icon, children }: { label: string, icon: any, children: React.ReactNode }) => (
@@ -170,6 +230,8 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
                       <input 
                         required
                         type="text" 
+                        value={formData.name}
+                        onChange={e => setFormData({ ...formData, name: e.target.value })}
                         className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 placeholder:text-slate-300"
                         placeholder="Full Identity"
                       />
@@ -178,6 +240,8 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
                       <input 
                         required
                         type="email" 
+                        value={formData.email}
+                        onChange={e => setFormData({ ...formData, email: e.target.value })}
                         className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 placeholder:text-slate-300"
                         placeholder="active@mrman.fit"
                       />
@@ -189,12 +253,19 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
                       <input 
                         required
                         type="tel" 
+                        value={formData.phone}
+                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
                         className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800"
                         placeholder="+254..."
                       />
                     </InputField>
                     <InputField label="Deployment Region" icon={MapPin}>
-                      <select required className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 appearance-none">
+                      <select 
+                        required 
+                        value={formData.location}
+                        onChange={e => setFormData({ ...formData, location: e.target.value })}
+                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 appearance-none"
+                      >
                         <option value="">Select Base</option>
                         {nakuruLocations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
                       </select>
@@ -204,14 +275,25 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
 
                   <div className="grid md:grid-cols-2 gap-8">
                     <InputField label="System Protocol" icon={Dumbbell}>
-                      <select required className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 appearance-none">
+                      <select 
+                        required 
+                        value={formData.protocol}
+                        onChange={e => setFormData({ ...formData, protocol: e.target.value })}
+                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 appearance-none"
+                      >
                         <option value="">Select Vector</option>
                         {programTypes.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
                       </select>
                       <ChevronRight size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 rotate-90 pointer-events-none" />
                     </InputField>
                     <InputField label="Cycle Duration" icon={Timer}>
-                      <select required className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 appearance-none">
+                      <select 
+                        required 
+                        value={formData.duration}
+                        onChange={e => setFormData({ ...formData, duration: e.target.value })}
+                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 appearance-none"
+                      >
+                        <option value="">Select Phase</option>
                         {durations.map(d => <option key={d} value={d}>{d}</option>)}
                       </select>
                       <ChevronRight size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 rotate-90 pointer-events-none" />
@@ -222,6 +304,8 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
                     <input 
                       required
                       type="date" 
+                      value={formData.date}
+                      onChange={e => setFormData({ ...formData, date: e.target.value })}
                       className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800"
                     />
                   </InputField>
@@ -269,7 +353,9 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
 export const Layout = ({ children }: React.PropsWithChildren) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isBookingModalOpen, setIsBookingModalOpen, isAuthModalOpen, setIsAuthModalOpen } = useModal();
+  const { user, profile } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navItems = [
     { name: 'Home', path: '/', icon: Zap },
@@ -308,13 +394,25 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
           </div>
 
           <div className="flex items-center gap-6">
-            <button 
-              onClick={() => setIsAuthModalOpen(true)}
-              className="hidden md:flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-rose-600 transition-all outline-none focus-visible:ring-2 focus-visible:ring-rose-600 rounded-lg px-2"
-            >
-              <User size={18} />
-              <span>Sign In</span>
-            </button>
+            {user ? (
+               <button 
+               onClick={() => navigate('/dashboard')}
+               className="hidden md:flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-full px-4 py-1.5 hover:bg-white transition-all shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-rose-600"
+             >
+               <div className="w-8 h-8 rounded-full overflow-hidden border border-white shadow-sm shrink-0">
+                 <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`} alt="User" className="w-full h-full object-cover" />
+               </div>
+               <span className="text-sm font-bold text-slate-800 hidden lg:block">{profile?.displayName || user.displayName}</span>
+             </button>
+            ) : (
+              <button 
+                onClick={() => setIsAuthModalOpen(true)}
+                className="hidden md:flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-rose-600 transition-all outline-none focus-visible:ring-2 focus-visible:ring-rose-600 rounded-lg px-2"
+              >
+                <User size={18} />
+                <span>Sign In</span>
+              </button>
+            )}
             <button 
               onClick={() => setIsBookingModalOpen(true)}
               className="hidden md:block text-sm font-black bg-rose-600 text-white px-8 py-3 rounded-full hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2 uppercase tracking-wider"

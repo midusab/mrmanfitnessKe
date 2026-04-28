@@ -7,6 +7,9 @@ import StudioPage from './pages/Studio';
 import { LoadingSpinner } from './components/SharedUI';
 import { motion, AnimatePresence } from 'motion/react';
 import { ModalProvider } from './context/ModalContext';
+import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
+import DashboardPage from './pages/Dashboard';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -33,12 +36,15 @@ export default function App() {
     const timer = setTimeout(() => {
       setIsBooting(false);
     }, 1500);
+
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <ModalProvider>
-      <BrowserRouter>
+    <AuthProvider>
+      <NotificationProvider>
+        <ModalProvider>
+        <BrowserRouter>
         <ScrollToTop />
         <AnimatePresence mode="wait">
           {isBooting ? (
@@ -75,11 +81,14 @@ export default function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/programs" element={<ProgramsPage />} />
                 <Route path="/studio" element={<StudioPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
               </Routes>
             </Layout>
           )}
         </AnimatePresence>
       </BrowserRouter>
     </ModalProvider>
-  );
+  </NotificationProvider>
+</AuthProvider>
+);
 }
