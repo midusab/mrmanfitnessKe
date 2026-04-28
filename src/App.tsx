@@ -10,6 +10,7 @@ import { ModalProvider } from './context/ModalContext';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import DashboardPage from './pages/Dashboard';
+import PortfolioPage from './pages/Portfolio';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -81,6 +82,7 @@ export default function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/programs" element={<ProgramsPage />} />
                 <Route path="/studio" element={<StudioPage />} />
+                <Route path="/portfolio" element={<PortfolioPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
               </Routes>
             </Layout>

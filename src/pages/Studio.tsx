@@ -76,7 +76,7 @@ export default function StudioPage() {
     },
     {
       title: "Neural Engine Room",
-      description: "A specialized zone for high-performance neurological conditioning. Focus on speed, agility, and cognitive-physical synchronization protocols.",
+      description: "A specialized zone for high-performance training. Focus on speed, agility, and mind-body coordination training plans.",
       image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=1200",
       features: ["Reaction Lights", "Precision Mats", "High-Speed Optics"],
       delay: 0.3

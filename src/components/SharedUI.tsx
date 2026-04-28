@@ -137,7 +137,7 @@ export const TransformationCard = ({ name, result, duration, beforeImg, afterImg
       </div>
       <div className="h-1 w-0 group-hover:w-full bg-emerald-500/50 rounded-full transition-all duration-1000 overflow-hidden" />
       <p className="text-white/70 text-xs font-medium max-h-0 group-hover:max-h-24 overflow-hidden transition-all duration-1000 leading-relaxed italic">
-        "Mr Man Fitness completely re-engineered my metabolic threshold. The results speak for themselves through Nakuru's elite protocols."
+        "Mr Man Fitness completely transformed my fitness level. The results speak for themselves through Nakuru's elite training plans."
       </p>
     </div>
   </motion.div>

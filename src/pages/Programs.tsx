@@ -134,7 +134,7 @@ export default function ProgramsPage() {
       intensity: "Moderate-High",
       duration: "75 mins",
       image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800",
-      description: "A comprehensive resistance protocol designed for hypertrophy and power production. We use periodization models to ensure consistent progress without hitting plateaus.",
+      description: "A comprehensive training plan designed for muscle growth and power production. We use structured models to ensure consistent progress without hitting plateaus.",
       benefits: ["Muscle Mass Growth", "Power Output", "Metabolic Flexibility", "Injury Resilience"],
       delay: 0.2
     },
@@ -154,7 +154,7 @@ export default function ProgramsPage() {
       intensity: "Informational",
       duration: "90 mins",
       image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800",
-      description: "One-on-one consultation focused on energy systems and micronutrient optimization. We engineer your nutrition to match your training cycles and lifestyle demands.",
+      description: "One-on-one consultation focused on energy levels and nutritional optimization. We design your nutrition to match your training phases and lifestyle demands.",
       benefits: ["Metabolic Efficiency", "Macro-Nutrient Balance", "Cognitive Sharpness", "Peak Performance Fueling"],
       delay: 0.4
     },
@@ -174,7 +174,7 @@ export default function ProgramsPage() {
       intensity: "High",
       duration: "Ongoing",
       image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800",
-      description: "Strategic mass engineering for those seeking to maximize their physical footprint. We combine high-volume technical lifts with massive fueling protocols.",
+      description: "Strategic muscle building for those seeking to maximize their physical frame. We combine high-volume training with specialized fueling plans.",
       benefits: ["Mass Velocity", "Size Expansion", "Absolute Power", "Volume Threshold Increase"],
       delay: 0.6
     }
@@ -191,10 +191,10 @@ export default function ProgramsPage() {
            Service Matrix 2026
         </div>
         <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 leading-[0.8] mb-8">
-          Elite <br/>Protocols.
+          Elite <br/>Training.
         </h1>
         <p className="text-xl text-slate-500 font-medium max-w-2xl leading-relaxed">
-          The Mr Man Fitness methodology: A rigorous selection of human optimization programs engineered for Nakuru's highest achievers.
+          The Mr Man Fitness methodology: A rigorous selection of physical optimization programs designed for Nakuru's highest achievers.
         </p>
       </motion.div>
 
@@ -209,9 +209,9 @@ export default function ProgramsPage() {
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-600 text-[10px] font-black text-white mb-8 rounded-full">
             <Zap size={12} fill="white" /> Biological Reserve
           </div>
-          <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 leading-none mb-8">Not sure which vector to choose?</h2>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 leading-none mb-8">Not sure which path to choose?</h2>
           <p className="text-slate-600 font-medium max-w-xl mx-auto mb-12 leading-relaxed">
-            Every body is a unique system. We recommend a full biometric assessment to determine the most efficient protocol for your current physiological state.
+            Every body is unique. We recommend a full health assessment to determine the most efficient plan for your current fitness level.
           </p>
           <button 
             onClick={() => setIsBookingModalOpen(true)}

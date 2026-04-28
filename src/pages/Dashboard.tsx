@@ -85,10 +85,10 @@ const DashboardPage = () => {
       setShowSuccessAnim(true);
       setTimeout(() => setShowSuccessAnim(false), 3000);
       
-      notify("Identity synced with mainframe.", "success");
+      notify("Profile updated successfully.", "success");
     } catch (error) {
       console.error('Profile update error:', error);
-      notify("Synchronization failed. Check biometrics.", "error");
+      notify("Failed to update profile. Please try again.", "error");
     } finally {
       setIsUpdatingProfile(false);
     }
@@ -110,7 +110,7 @@ const DashboardPage = () => {
       });
 
       setTestimonialQuote('');
-      notify("Testimonial transmitted. Awaiting synchronization.", "protocol");
+      notify("Feedback submitted successfully.", "protocol");
     } catch (error) {
       console.error('Testimonial submission error:', error);
       notify("Submission failed.", "error");
@@ -128,7 +128,7 @@ const DashboardPage = () => {
         updated_at: new Date().toISOString()
       }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `bookings/${bookingId}`));
 
-      notify("Protocol marked as Completed (Simulated Admin Action).", "success");
+      notify("Workout marked as Completed.", "success");
       fetchData();
     } catch (e) {
       console.error(e);
@@ -147,7 +147,7 @@ const DashboardPage = () => {
         created_at: new Date().toISOString()
       }).catch(err => handleFirestoreError(err, OperationType.CREATE, 'program_updates'));
 
-      notify("System update dispatched (Simulated Admin Action).", "success");
+      notify("System update posted.", "success");
       fetchData();
     } catch (e) {
       console.error(e);
@@ -185,15 +185,15 @@ const DashboardPage = () => {
                   {profile?.display_name || user?.displayName || user?.email?.split('@')[0]}
                 </h2>
                 <p className="text-rose-600 text-[10px] font-black uppercase tracking-[0.2em] mt-2">
-                  Elite Status: Verified
+                  Elite Member
                 </p>
               </div>
 
               <div className="mt-10 space-y-2">
                 {[
                   { id: 'overview', label: 'Overview', icon: Activity },
-                  { id: 'profile', label: 'Identity', icon: UserIcon },
-                  { id: 'bookings', label: 'Protocols', icon: Calendar },
+                  { id: 'profile', label: 'Profile', icon: UserIcon },
+                  { id: 'bookings', label: 'Workouts', icon: Calendar },
                   { id: 'updates', label: 'Updates', icon: Bell }
                 ].map(tab => (
                   <button
@@ -217,7 +217,7 @@ const DashboardPage = () => {
                   className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-rose-600 hover:bg-rose-50 transition-all"
                 >
                   <LogOut size={20} />
-                  Terminate Session
+                  Sign Out
                 </button>
               </div>
             </div>
@@ -239,7 +239,7 @@ const DashboardPage = () => {
                       <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
                         <Activity size={24} />
                       </div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active Protocols</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active Workouts</p>
                       <h4 className="text-3xl font-black tracking-tighter text-slate-900">
                         {bookings.filter(b => b.status === 'confirmed').length}
                       </h4>
@@ -248,21 +248,21 @@ const DashboardPage = () => {
                       <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-6">
                         <Calendar size={24} />
                       </div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Cycles</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Sessions</p>
                       <h4 className="text-3xl font-black tracking-tighter text-slate-900">{bookings.length}</h4>
                     </div>
                     <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
                       <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
                         <ShieldCheck size={24} />
                       </div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">System Integrity</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">System Health</p>
                       <h4 className="text-3xl font-black tracking-tighter text-slate-900">Optimal</h4>
                     </div>
                   </div>
 
                   <div className="liquid-glass border-slate-100 p-10 rounded-[3rem]">
                     <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-8 flex items-center gap-3">
-                      <Bell className="text-rose-600" size={24} /> Latest Intelligence
+                      <Bell className="text-rose-600" size={24} /> Latest Updates
                     </h3>
 
                     {/* Developer Simulation Controls */}
@@ -274,7 +274,7 @@ const DashboardPage = () => {
                             onClick={simulateUpdate}
                             className="text-xs font-bold px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition-all flex items-center gap-2"
                           >
-                            <Zap size={14} className="text-rose-600" /> Dispatch System Update
+                            <Zap size={14} className="text-rose-600" /> Post System Update
                           </button>
                         </div>
                       </div>
@@ -286,8 +286,8 @@ const DashboardPage = () => {
                           <h5 className="font-black text-slate-800 mb-2">{update.title}</h5>
                            <p className="text-slate-500 text-sm leading-relaxed">{update.content}</p>
                           <div className="mt-4 flex items-center gap-4">
-                             <span className="text-[9px] font-black text-rose-600 uppercase bg-rose-50 px-2 py-1 rounded-md">
-                               {update.program_type || 'Global'}
+                           <span className="text-[9px] font-black text-rose-600 uppercase bg-rose-50 px-2 py-1 rounded-md">
+                               {update.program_type || 'General'}
                              </span>
                              <span className="text-[9px] font-black text-slate-400 uppercase">
                                {new Date(update.created_at).toLocaleDateString()}
@@ -327,7 +327,7 @@ const DashboardPage = () => {
                           <div className="w-20 h-20 bg-rose-500 rounded-full flex items-center justify-center shadow-2xl shadow-rose-500/40 mb-4">
                             <ShieldCheck size={40} className="text-white" />
                           </div>
-                          <p className="text-rose-600 font-black uppercase tracking-[0.3em] text-xs">Identity Synchronized</p>
+                          <p className="text-rose-600 font-black uppercase tracking-[0.3em] text-xs">Profile Saved</p>
                           <motion.div 
                             animate={{ opacity: [0, 1, 0], scale: [1, 1.5, 2] }}
                             transition={{ duration: 1.5, repeat: Infinity }}
@@ -340,14 +340,14 @@ const DashboardPage = () => {
 
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                     <div>
-                      <h3 className="text-3xl font-black tracking-tighter text-slate-900">Define Identity.</h3>
+                      <h3 className="text-3xl font-black tracking-tighter text-slate-900">Edit Profile.</h3>
                       <p className="text-slate-400 font-bold text-sm mt-2 flex items-center gap-2">
-                        <Zap size={14} className="text-rose-600" /> Biometric profile sync active
+                        <Zap size={14} className="text-rose-600" /> Profile sync active
                       </p>
                     </div>
                     <div className="flex items-center gap-4 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
                       <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Mainframe Connected</span>
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">System Connected</span>
                     </div>
                   </div>
 
@@ -356,7 +356,7 @@ const DashboardPage = () => {
                       <div className="space-y-3 group">
                         <div className="flex justify-between items-center px-1">
                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                            <UserIcon size={12} className="text-rose-500" /> Global Descriptor
+                            <UserIcon size={12} className="text-rose-500" /> Full Name
                           </label>
                           <span className="text-[8px] font-black text-emerald-500 uppercase opacity-0 group-focus-within:opacity-100 transition-opacity">Optimal</span>
                         </div>
@@ -376,8 +376,8 @@ const DashboardPage = () => {
                       <div className="space-y-3 flex flex-col justify-end">
                         <div className="p-6 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
                           <p className="text-[9px] font-black text-slate-400 leading-relaxed uppercase tracking-wider">
-                            Sync Status: <span className="text-slate-900">Encrypted</span><br/>
-                            Vulnerability Index: <span className="text-emerald-500">0.02%</span>
+                            Sync Status: <span className="text-slate-900">Secure</span><br/>
+                            Stability Index: <span className="text-emerald-500">99.98%</span>
                           </p>
                         </div>
                       </div>
@@ -386,7 +386,7 @@ const DashboardPage = () => {
                     <div className="space-y-3 group">
                       <div className="flex justify-between items-center px-1">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                          <MessageSquare size={12} className="text-rose-500" /> Tactical Intent / Bio
+                          <MessageSquare size={12} className="text-rose-500" /> About Me & Goals
                         </label>
                         <span className="text-[8px] font-black text-slate-300 uppercase">Limit: 256 Chars</span>
                       </div>
@@ -396,7 +396,7 @@ const DashboardPage = () => {
                           value={profileData.bio}
                           onChange={e => setProfileData({...profileData, bio: e.target.value})}
                           className="w-full bg-white border-2 border-slate-100 rounded-[2.5rem] px-8 py-6 focus:outline-none focus:ring-8 focus:ring-rose-500/5 focus:border-rose-500 transition-all font-bold text-slate-700 leading-relaxed resize-none placeholder:text-slate-200"
-                          placeholder="State your physiological objectives and high-altitude mission goals..."
+                          placeholder="Tell us about your fitness goals..."
                         />
                          <div className="absolute right-6 bottom-6 opacity-20 group-focus-within:opacity-100 group-focus-within:text-rose-500 transition-all">
                           <Settings size={20} />
@@ -414,12 +414,12 @@ const DashboardPage = () => {
                           {isUpdatingProfile ? (
                             <>
                               <Activity className="animate-spin" size={18} />
-                              Syncing Identity...
+                              Saving Profile...
                             </>
                           ) : (
                             <>
                               <Zap size={18} />
-                              Confirm Synchronization
+                              Save Changes
                             </>
                           )}
                         </span>
@@ -435,7 +435,7 @@ const DashboardPage = () => {
                       </button>
                       
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest max-w-[200px] leading-tight">
-                        Warning: Identity sync cannot be reverted within a 24h cycle once committed.
+                        Note: Profile changes are saved to the secure system immediately.
                       </p>
                     </div>
                   </form>
@@ -451,7 +451,7 @@ const DashboardPage = () => {
                   className="space-y-8"
                 >
                   <div className="liquid-glass border-slate-100 p-10 rounded-[3rem]">
-                    <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-10">Active Protocols.</h3>
+                    <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-10">Active Workout Plans.</h3>
                     <div className="space-y-6">
                       {bookings.length > 0 ? bookings.map(booking => (
                         <div key={booking.id} className="p-8 bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -467,18 +467,18 @@ const DashboardPage = () => {
                               </span>
                             </div>
                              <p className="text-slate-500 font-medium text-sm flex items-center gap-2">
-                               <Calendar size={14} /> Activation: {new Date(booking.activation_date).toLocaleDateString()}
+                               <Calendar size={14} /> Start Date: {new Date(booking.activation_date).toLocaleDateString()}
                              </p>
                           </div>
 
                           {booking.status === 'completed' && (
                             <div className="w-full md:w-auto p-6 bg-rose-50/50 rounded-2xl border border-rose-100">
                               <h6 className="text-[10px] font-black text-rose-600 uppercase mb-3 flex items-center gap-2">
-                                <Star size={12} fill="currentColor" /> Submit Intelligence
+                                <Star size={12} fill="currentColor" /> Share Your Story
                               </h6>
                               <div className="flex gap-2">
                                 <input 
-                                  placeholder="Share your evolution quote..."
+                                  placeholder="How was your progress?"
                                   value={testimonialQuote}
                                   onChange={e => setTestimonialQuote(e.target.value)}
                                   className="flex-1 bg-white border border-rose-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20"
@@ -506,12 +506,12 @@ const DashboardPage = () => {
                         </div>
                       )) : (
                         <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
-                          <p className="text-slate-400 font-bold">No active protocols detected.</p>
+                          <p className="text-slate-400 font-bold">No active plans detected.</p>
                           <button 
                             onClick={() => navigate('/programs')}
                             className="mt-4 text-rose-600 font-black text-sm uppercase tracking-widest hover:underline"
                           >
-                            Explore Protocols
+                            Explore Training Plans
                           </button>
                         </div>
                       )}
@@ -528,7 +528,7 @@ const DashboardPage = () => {
                   exit={{ opacity: 0, y: -10 }}
                   className="liquid-glass border-slate-100 p-10 rounded-[3rem]"
                 >
-                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-10">System Intelligence.</h3>
+                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-10">System Updates.</h3>
                   <div className="space-y-8">
                     {updates.length > 0 ? updates.map(update => (
                       <div key={update.id} className="relative pl-8 before:absolute before:left-0 before:top-2 before:bottom-0 before:w-0.5 before:bg-rose-100">
@@ -538,11 +538,11 @@ const DashboardPage = () => {
                          <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                            <span>{new Date(update.created_at).toLocaleString()}</span>
                            <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                           <span className="text-rose-600">Admin Dispatch</span>
+                           <span className="text-rose-600">Admin Post</span>
                          </div>
                       </div>
                     )) : (
-                      <div className="text-center py-12 text-slate-400 font-medium">Clear of new intelligence.</div>
+                      <div className="text-center py-12 text-slate-400 font-medium">No new updates.</div>
                     )}
                   </div>
                 </motion.div>

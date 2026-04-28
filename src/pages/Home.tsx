@@ -40,7 +40,7 @@ const pricingTiers = [
     name: "Foundation",
     price: "8,500",
     description: "Ideal for metabolic reset and core engineering.",
-    features: ["Biometric Assessment", "3x Group Sessions/Week", "Nutrition Roadmap", "Progress App Access"],
+    features: ["Health Assessment", "3x Group Sessions/Week", "Nutrition Roadmap", "Progress App Access"],
     cta: "Book Session",
     highlight: false
   },
@@ -48,7 +48,7 @@ const pricingTiers = [
     name: "Vanguard",
     price: "15,000",
     description: "The peak performance tier for high-intensity growth.",
-    features: ["Advanced Labs", "Unlimited Access", "Personal Nutritionist", "Priority Support", "Neural Profiling"],
+    features: ["Advanced Labs", "Unlimited Access", "Personal Nutritionist", "Priority Support", "Fitness Profiling"],
     cta: "Book Session",
     highlight: true
   },
@@ -56,7 +56,7 @@ const pricingTiers = [
     name: "Titan",
     price: "25,000",
     description: "Fully bespoke engineering for executive performance.",
-    features: ["Daily Biometrics", "1-on-1 Clinical Focus", "Personal Chef Sync", "Concierge Recovery", "Bespoke Protocols"],
+    features: ["Daily Health Stats", "1-on-1 Personal Training", "Personal Chef Sync", "Full Recovery", "Bespoke Training"],
     cta: "Book Session",
     highlight: false
   }
@@ -146,7 +146,7 @@ export default function HomePage() {
     {
       name: "Elena Wangui",
       role: "Business Executive",
-      quote: "Finally, a trainer who understands the balance between a demanding career and peak physical health. The hydration protocols are game changers.",
+      quote: "Finally, a trainer who understands the balance between a demanding career and peak physical health. The hydration plans are game changers.",
       image: "https://picsum.photos/seed/person3/100"
     }
   ];
@@ -197,6 +197,7 @@ export default function HomePage() {
   ]);
 
   const [realTestimonials, setRealTestimonials] = useState<any[]>([]);
+  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
 
   useEffect(() => {
     const fetchTestimonials = async () => {
@@ -212,6 +213,8 @@ export default function HomePage() {
       } catch (e) {
         console.error("Testimonials fetch error:", e);
         handleFirestoreError(e, OperationType.LIST, 'testimonials');
+      } finally {
+        setLoadingTestimonials(false);
       }
     };
     fetchTestimonials();
@@ -325,12 +328,12 @@ export default function HomePage() {
               <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-800 leading-[0.9] mb-8">
                 Elite Programs.
               </h2>
-              <p className="text-slate-600 font-medium">Precision physical engineering protocols specialized for human optimization.</p>
+              <p className="text-slate-600 font-medium">Custom fitness programs specialized for physical optimization.</p>
             </div>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard icon={Dumbbell} title="Compound Lifts" description="Master the foundational movements. Specialized coaching on squats, deadlifts, and presses." delay={0.1} color="rose" />
-            <FeatureCard icon={Target} title="Strength Training" description="Progressive resistance protocols designed to increase absolute force output." delay={0.2} color="blue" />
+            <FeatureCard icon={Target} title="Strength Training" description="Strength training plans designed to increase absolute power output." delay={0.2} color="blue" />
             <FeatureCard icon={Activity} title="Light Cardio" description="Low-intensity steady-state conditioning (LISS) to optimize aerobic base." delay={0.3} color="emerald" />
           </div>
         </section>
@@ -424,7 +427,7 @@ export default function HomePage() {
               
               <div className="space-y-6">
                 {[
-                  { icon: Brain, title: "Mental Sovereignty", desc: "Shift from 'I have to' to 'I choose to'. Own every rep and every recovery protocol.", color: "blue" },
+                  { icon: Brain, title: "Mental Strength", desc: "Shift from 'I have to' to 'I choose to'. Own every rep and every recovery plan.", color: "blue" },
                   { icon: Zap, title: "Decisive Action", desc: "Shorten the gap between intent and execution. Eliminate 'drift' from your daily routine.", color: "rose" },
                   { icon: ShieldCheck, title: "Absolute Ownership", desc: "No excuses. No external blame. Your results are a direct output of your internal state.", color: "emerald" }
                 ].map((pillar, i) => (
@@ -462,7 +465,7 @@ export default function HomePage() {
                   <p className="text-white text-2xl font-black italic tracking-tight mb-4">
                     "Control the variable that matters most: Yourself."
                   </p>
-                  <p className="text-blue-400 font-bold text-xs uppercase tracking-widest">— Protocol Alpha-01</p>
+                  <p className="text-blue-400 font-bold text-xs uppercase tracking-widest">— Transformation Plan</p>
                 </div>
               </div>
               
@@ -508,8 +511,8 @@ export default function HomePage() {
                       <Mail size={24} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Protocol</p>
-                      <p className="text-xl font-bold text-slate-800">protocols@mrman.fit</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Address</p>
+                      <p className="text-xl font-bold text-slate-800">hello@mrman.fit</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 group cursor-pointer">
@@ -547,7 +550,7 @@ export default function HomePage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Intel Query</label>
-                    <textarea rows={4} placeholder="Protocol inquiry..." className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800 resize-none"></textarea>
+                    <textarea rows={4} placeholder="Tell us your goals..." className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800 resize-none"></textarea>
                   </div>
                   <button className="w-full bg-slate-900 text-white font-black py-6 rounded-2xl hover:bg-rose-600 transition-all shadow-xl shadow-slate-900/10 active:scale-95 uppercase tracking-widest text-xs">
                     Transmit Message
