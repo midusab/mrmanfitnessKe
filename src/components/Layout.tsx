@@ -400,9 +400,9 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
                className="hidden md:flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-full px-4 py-1.5 hover:bg-white transition-all shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-rose-600"
              >
                <div className="w-8 h-8 rounded-full overflow-hidden border border-white shadow-sm shrink-0">
-                 <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`} alt="User" className="w-full h-full object-cover" />
+                 <img src={user.user_metadata.avatar_url || `https://ui-avatars.com/api/?name=${user.user_metadata.full_name || user.email}`} alt="User" className="w-full h-full object-cover" />
                </div>
-               <span className="text-sm font-bold text-slate-800 hidden lg:block">{profile?.displayName || user.displayName}</span>
+               <span className="text-sm font-bold text-slate-800 hidden lg:block">{profile?.display_name || user.user_metadata.full_name || user.email?.split('@')[0]}</span>
              </button>
             ) : (
               <button 
