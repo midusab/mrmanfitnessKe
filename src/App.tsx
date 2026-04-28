@@ -11,6 +11,7 @@ import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import DashboardPage from './pages/Dashboard';
 import PortfolioPage from './pages/Portfolio';
+import AdminPage from './pages/Admin';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -84,6 +85,7 @@ export default function App() {
                 <Route path="/studio" element={<StudioPage />} />
                 <Route path="/portfolio" element={<PortfolioPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/admin" element={<AdminPage />} />
               </Routes>
             </Layout>
           )}

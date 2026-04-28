@@ -3,7 +3,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { useModal } from '../context/ModalContext';
 import { db, OperationType, handleFirestoreError } from '../lib/firebase';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, addDoc } from 'firebase/firestore';
 import { 
   Zap, 
   Target, 
@@ -31,7 +31,8 @@ import {
   FeatureCard, 
   TestimonialCard, 
   TransformationCard, 
-  BlogCard 
+  BlogCard,
+  LoadingSpinner
 } from '../components/SharedUI';
 
 
@@ -222,6 +223,34 @@ export default function HomePage() {
 
   const activeTestimonials = realTestimonials.length > 0 ? realTestimonials : testimonials;
 
+  const [contactData, setContactData] = useState({ name: '', email: '', message: '' });
+  const [isSubmittingContact, setIsSubmittingContact] = useState(false);
+  const { notify } = useModal() as any; // Using notify from context if available, or just alert
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactData.name || !contactData.email || !contactData.message) return;
+    
+    setIsSubmittingContact(true);
+    try {
+      const inquiriesRef = collection(db, 'inquiries');
+      await addDoc(inquiriesRef, {
+        ...contactData,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }).catch(err => handleFirestoreError(err, OperationType.CREATE, 'inquiries'));
+      
+      setContactData({ name: '', email: '', message: '' });
+      // We don't have direct access to notify here easily without useNotification, but let's assume it's injected or use alert
+      alert("Message transmitted to headquarters.");
+    } catch (e) {
+      console.error(e);
+      alert("Transmission failed.");
+    } finally {
+      setIsSubmittingContact(false);
+    }
+  };
+
   return (
     <div ref={containerRef}>
       {/* Hero Background */}
@@ -384,11 +413,17 @@ export default function HomePage() {
               Voice of the Elite.
             </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {activeTestimonials.map((t, i) => (
-              <TestimonialCard key={i} {...t} delay={0.1 + (i * 0.1)} />
-            ))}
-          </div>
+          {loadingTestimonials ? (
+            <div className="flex justify-center py-20">
+              <LoadingSpinner size={40} color="#e11d48" />
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-8">
+              {activeTestimonials.map((t, i) => (
+                <TestimonialCard key={i} {...t} delay={0.1 + (i * 0.1)} />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Pricing Tiers Section */}
@@ -537,23 +572,47 @@ export default function HomePage() {
               </div>
               
               <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-rose-900/5 border border-slate-50">
-                <form className="space-y-6">
+                <form onSubmit={handleContactSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Identity</label>
-                      <input type="text" placeholder="Your Name" className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800" />
+                      <input 
+                        required
+                        type="text" 
+                        value={contactData.name}
+                        onChange={e => setContactData({...contactData, name: e.target.value})}
+                        placeholder="Your Name" 
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800" 
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Comm Link</label>
-                      <input type="email" placeholder="Email Address" className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800" />
+                      <input 
+                        required
+                        type="email" 
+                        value={contactData.email}
+                        onChange={e => setContactData({...contactData, email: e.target.value})}
+                        placeholder="Email Address" 
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800" 
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Intel Query</label>
-                    <textarea rows={4} placeholder="Tell us your goals..." className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800 resize-none"></textarea>
+                    <textarea 
+                      required
+                      rows={4} 
+                      value={contactData.message}
+                      onChange={e => setContactData({...contactData, message: e.target.value})}
+                      placeholder="Tell us your goals..." 
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800 resize-none"
+                    ></textarea>
                   </div>
-                  <button className="w-full bg-slate-900 text-white font-black py-6 rounded-2xl hover:bg-rose-600 transition-all shadow-xl shadow-slate-900/10 active:scale-95 uppercase tracking-widest text-xs">
-                    Transmit Message
+                  <button 
+                    disabled={isSubmittingContact}
+                    className="w-full bg-slate-900 text-white font-black py-6 rounded-2xl hover:bg-rose-600 transition-all shadow-xl shadow-slate-900/10 active:scale-95 uppercase tracking-widest text-xs disabled:opacity-50"
+                  >
+                    {isSubmittingContact ? "Transmitting..." : "Transmit Message"}
                   </button>
                 </form>
               </div>

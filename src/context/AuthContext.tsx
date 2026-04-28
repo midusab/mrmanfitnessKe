@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db, signInWithGoogle, logout, OperationType, handleFirestoreError } from '../lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 
 interface AuthContextType {
   user: User | null;
@@ -58,13 +58,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           display_name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
           email: firebaseUser.email,
           photo_url: firebaseUser.photoURL,
+          role: firebaseUser.email === 'midusab@gmail.com' ? 'admin' : 'user',
           bio: '',
           updated_at: new Date().toISOString(),
         };
         await setDoc(profileRef, newProfile);
         setProfile(newProfile);
       } else {
-        setProfile(docSnap.data());
+        const existingData = docSnap.data();
+        // Ensure admin role if email matches but role is not set
+        if (firebaseUser.email === 'midusab@gmail.com' && existingData.role !== 'admin') {
+          await updateDoc(profileRef, { role: 'admin' });
+          setProfile({ ...existingData, role: 'admin' });
+        } else {
+          setProfile(existingData);
+        }
       }
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, `profiles/${firebaseUser.uid}`);

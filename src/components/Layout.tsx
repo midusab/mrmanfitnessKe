@@ -372,6 +372,7 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
     { name: 'Studio', path: '/studio', icon: Sparkles },
     { name: 'Portfolio', path: '/portfolio', icon: Activity },
     { name: 'Contact', path: '/#contact', icon: MapPin },
+    ...(profile?.role === 'admin' ? [{ name: 'Admin', path: '/admin', icon: ShieldCheck }] : []),
   ];
 
   return (

@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, CheckCircle, AlertCircle, Info, Sparkles } from 'lucide-react';
 
+import ShinyText from '../components/bits/ShinyText';
+
 type NotificationType = 'success' | 'error' | 'info' | 'protocol';
 
 interface Notification {
@@ -24,7 +26,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setNotifications((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
-    }, 5000);
+    }, 6000); // Slightly longer duration for premium feel
   }, []);
 
   const remove = (id: string) => {
@@ -35,50 +37,75 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     <NotificationContext.Provider value={{ notify }}>
       {children}
       <div className="fixed top-8 right-8 z-[200] flex flex-col gap-4 pointer-events-none w-full max-w-sm">
-        <AnimatePresence>
-          {notifications.map((n) => (
+        <AnimatePresence mode="popLayout">
+          {notifications.map((n, index) => (
             <motion.div
               key={n.id}
-              initial={{ opacity: 0, x: 50, scale: 0.9 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 20, scale: 0.95, filter: 'blur(10px)' }}
+              layout
+              initial={{ opacity: 0, x: 50, scale: 0.8, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, x: 0, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, scale: 0.9, filter: 'blur(10px)', transition: { duration: 0.2 } }}
+              transition={{ 
+                type: 'spring', 
+                stiffness: 400, 
+                damping: 30,
+                delay: 0.05 
+              }}
               className="pointer-events-auto"
             >
-              <div className="liquid-glass p-1 border-white/40 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.15)] rounded-[2rem] overflow-hidden">
-                <div className="bg-white/40 backdrop-blur-3xl px-6 py-4 flex items-center gap-4 border border-white/60 rounded-[1.9rem]">
-                  <div className={`p-2.5 rounded-2xl shrink-0 ${
-                    n.type === 'success' ? 'bg-emerald-50 text-emerald-500' :
-                    n.type === 'error' ? 'bg-rose-50 text-rose-500' :
-                    n.type === 'protocol' ? 'bg-slate-900 text-white' :
-                    'bg-blue-50 text-blue-500'
+              <div className="liquid-glass p-0.5 border-white/50 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] rounded-[2.5rem] overflow-hidden group">
+                <div className="bg-white/30 backdrop-blur-3xl px-6 py-5 flex items-center gap-5 border border-white/60 rounded-[2.4rem] relative overflow-hidden">
+                  {/* Decorative Gradient Background */}
+                  <div className={`absolute inset-0 opacity-10 transition-opacity group-hover:opacity-20 ${
+                    n.type === 'success' ? 'bg-emerald-500' :
+                    n.type === 'error' ? 'bg-rose-500' :
+                    n.type === 'protocol' ? 'bg-slate-900' :
+                    'bg-blue-500'
+                  }`} />
+                  
+                  <div className={`relative z-10 p-3 rounded-2xl shrink-0 shadow-lg ${
+                    n.type === 'success' ? 'bg-emerald-500 text-white shadow-emerald-500/20' :
+                    n.type === 'error' ? 'bg-rose-500 text-white shadow-rose-500/20' :
+                    n.type === 'protocol' ? 'bg-slate-900 text-white shadow-slate-900/20' :
+                    'bg-blue-600 text-white shadow-blue-600/20'
                   }`}>
-                    {n.type === 'success' && <CheckCircle size={18} />}
-                    {n.type === 'error' && <AlertCircle size={18} />}
-                    {n.type === 'protocol' && <Sparkles size={18} />}
-                    {n.type === 'info' && <Info size={18} />}
+                    {n.type === 'success' && <CheckCircle size={20} />}
+                    {n.type === 'error' && <AlertCircle size={20} />}
+                    {n.type === 'protocol' && <Sparkles size={20} />}
+                    {n.type === 'info' && <Info size={20} />}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-slate-800 leading-tight">
-                      {n.message}
+                  
+                  <div className="relative z-10 flex-1 min-w-0">
+                    <p className="text-sm font-bold text-slate-800 leading-snug">
+                      {n.type === 'protocol' ? (
+                        <ShinyText text={n.message} speed={3} className="!text-slate-800" />
+                      ) : (
+                        n.message
+                      )}
+                    </p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 opacity-60">
+                      {n.type === 'protocol' ? 'System Broadcast' : 'Notification'}
                     </p>
                   </div>
+                  
                   <button 
                     onClick={() => remove(n.id)}
-                    className="p-1 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-slate-600"
+                    className="relative z-10 p-2 hover:bg-black/5 rounded-xl transition-all text-slate-400 hover:text-slate-600 active:scale-90"
                   >
                     <X size={16} />
                   </button>
                 </div>
+                
                 {/* Progress bar */}
                 <motion.div 
                   initial={{ width: '100%' }}
                   animate={{ width: '0%' }}
-                  transition={{ duration: 5, ease: 'linear' }}
-                  className={`h-0.5 mt-[-2px] ${
+                  transition={{ duration: 6, ease: 'linear' }}
+                  className={`h-1 relative z-20 ${
                     n.type === 'success' ? 'bg-emerald-500' :
                     n.type === 'error' ? 'bg-rose-500' :
                     n.type === 'protocol' ? 'bg-rose-600' :
-                    'bg-blue-500'
+                    'bg-blue-600'
                   }`}
                 />
               </div>
