@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "Profile": {
+      "title": "User Profile",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "User UID" },
+        "display_name": { "type": "string", "description": "User's display name" },
+        "email": { "type": "string", "description": "User's email" },
+        "photo_url": { "type": "string", "description": "User's photo URL" },
+        "bio": { "type": "string", "description": "User's bio" },
+        "updated_at": { "type": "string", "format": "date-time", "description": "Last update timestamp" }
+      },
+      "required": ["id", "email", "updated_at"]
+    },
+    "Booking": {
+      "title": "Protocol Booking",
+      "description": "User's protocol booking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "protocol": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "completed", "cancelled"] },
+        "activation_date": { "type": "string", "format": "date-time" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["user_id", "protocol", "status", "activation_date", "created_at"]
+    },
+    "ProgramUpdate": {
+      "title": "System Update",
+      "description": "System intelligence dispatch",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "program_type": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "created_at"]
+    },
+    "Testimonial": {
+      "title": "User Testimonial",
+      "description": "User shared intelligence",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "quote": { "type": "string" },
+        "image": { "type": "string" },
+        "booking_id": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["user_id", "name", "quote", "created_at"]
+    }
+  },
+  "firestore": {
+    "profiles/{userId}": {
+      "schema": "Profile",
+      "description": "User profiles"
+    },
+    "bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Protocol bookings"
+    },
+    "program_updates/{updateId}": {
+      "schema": "ProgramUpdate",
+      "description": "System updates"
+    },
+    "testimonials/{testimonialId}": {
+      "schema": "Testimonial",
+      "description": "User testimonials"
+    }
+  }
+}

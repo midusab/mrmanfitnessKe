@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { supabase } from '../lib/supabase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
+import { collection, query, where, getDocs, orderBy, limit, doc, updateDoc, addDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
 const DashboardPage = () => {
@@ -31,6 +32,8 @@ const DashboardPage = () => {
   const [testimonialQuote, setTestimonialQuote] = useState('');
   const [isSubmittingTestimonial, setIsSubmittingTestimonial] = useState<string | null>(null);
 
+  const [showSuccessAnim, setShowSuccessAnim] = useState(false);
+
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/');
@@ -45,31 +48,24 @@ const DashboardPage = () => {
   }, [user, authLoading, profile]);
 
   const fetchData = async () => {
+    if (!user) return;
     try {
       setLoading(true);
       // Fetch bookings
-      const { data: bData, error: bError } = await supabase
-        .from('bookings')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: false });
-
-      if (bError) throw bError;
-      setBookings(bData || []);
+      const bookingsRef = collection(db, 'bookings');
+      const qBookings = query(bookingsRef, where('user_id', '==', user.uid), orderBy('created_at', 'desc'));
+      const bookingsSnap = await getDocs(qBookings);
+      setBookings(bookingsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
       // Fetch program updates
-      const { data: uData, error: uError } = await supabase
-        .from('program_updates')
-        .select('*')
-        .lte('created_at', new Date().toISOString())
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (uError) throw uError;
-      setUpdates(uData || []);
+      const updatesRef = collection(db, 'program_updates');
+      const qUpdates = query(updatesRef, orderBy('created_at', 'desc'), limit(5));
+      const updatesSnap = await getDocs(qUpdates);
+      setUpdates(updatesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+      handleFirestoreError(error, OperationType.LIST, 'dashboard_data');
     } finally {
       setLoading(false);
     }
@@ -80,15 +76,15 @@ const DashboardPage = () => {
     if (!user) return;
     try {
       setIsUpdatingProfile(true);
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          ...profileData,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+      const profileRef = doc(db, 'profiles', user.uid);
+      await updateDoc(profileRef, {
+        ...profileData,
+        updated_at: new Date().toISOString()
+      });
 
-      if (error) throw error;
+      setShowSuccessAnim(true);
+      setTimeout(() => setShowSuccessAnim(false), 3000);
+      
       notify("Identity synced with mainframe.", "success");
     } catch (error) {
       console.error('Profile update error:', error);
@@ -102,19 +98,17 @@ const DashboardPage = () => {
     if (!user || !testimonialQuote) return;
     try {
       setIsSubmittingTestimonial(bookingId);
-      const { error } = await supabase
-        .from('testimonials')
-        .insert([{
-          user_id: user.id,
-          name: profile?.display_name || user.user_metadata.full_name || user.email?.split('@')[0],
-          role: "Optimizer",
-          quote: testimonialQuote,
-          image: user.user_metadata.avatar_url,
-          booking_id: bookingId,
-          created_at: new Date().toISOString()
-        }]);
+      const testimonialsRef = collection(db, 'testimonials');
+      await addDoc(testimonialsRef, {
+        user_id: user.uid,
+        name: profile?.display_name || user.displayName || user.email?.split('@')[0],
+        role: "Optimizer",
+        quote: testimonialQuote,
+        image: user.photoURL,
+        booking_id: bookingId,
+        created_at: new Date().toISOString()
+      });
 
-      if (error) throw error;
       setTestimonialQuote('');
       notify("Testimonial transmitted. Awaiting synchronization.", "protocol");
     } catch (error) {
@@ -128,15 +122,12 @@ const DashboardPage = () => {
   // Simulates an admin completing a booking
   const simulateCompletion = async (bookingId: string) => {
     try {
-      const { error } = await supabase
-        .from('bookings')
-        .update({
-          status: 'completed',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', bookingId);
+      const bookingRef = doc(db, 'bookings', bookingId);
+      await updateDoc(bookingRef, {
+        status: 'completed',
+        updated_at: new Date().toISOString()
+      }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `bookings/${bookingId}`));
 
-      if (error) throw error;
       notify("Protocol marked as Completed (Simulated Admin Action).", "success");
       fetchData();
     } catch (e) {
@@ -148,16 +139,14 @@ const DashboardPage = () => {
   // Simulates an admin dispatching a protocol update
   const simulateUpdate = async () => {
     try {
-      const { error } = await supabase
-        .from('program_updates')
-        .insert([{
-          title: "System Calibration: Optimization Cycle 4.2",
-          content: "We have updated the hypoxic training parameters for the Milimani studio. Please review your active protocol constraints.",
-          program_type: "Elite",
-          created_at: new Date().toISOString()
-        }]);
+      const updatesRef = collection(db, 'program_updates');
+      await addDoc(updatesRef, {
+        title: "System Calibration: Optimization Cycle 4.2",
+        content: "We have updated the hypoxic training parameters for the Milimani studio. Please review your active protocol constraints.",
+        program_type: "Elite",
+        created_at: new Date().toISOString()
+      }).catch(err => handleFirestoreError(err, OperationType.CREATE, 'program_updates'));
 
-      if (error) throw error;
       notify("System update dispatched (Simulated Admin Action).", "success");
       fetchData();
     } catch (e) {
@@ -187,13 +176,13 @@ const DashboardPage = () => {
               <div className="flex flex-col items-center text-center">
                 <div className="w-24 h-24 rounded-full border-4 border-white shadow-xl overflow-hidden mb-6">
                   <img 
-                    src={user?.user_metadata.avatar_url || `https://ui-avatars.com/api/?name=${user?.user_metadata.full_name || user?.email}`} 
+                    src={user?.photoURL || `https://ui-avatars.com/api/?name=${user?.displayName || user?.email}`} 
                     alt="Profile" 
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <h2 className="text-2xl font-black tracking-tighter text-slate-900 leading-tight">
-                  {profile?.display_name || user?.user_metadata.full_name || user?.email?.split('@')[0]}
+                  {profile?.display_name || user?.displayName || user?.email?.split('@')[0]}
                 </h2>
                 <p className="text-rose-600 text-[10px] font-black uppercase tracking-[0.2em] mt-2">
                   Elite Status: Verified
@@ -316,38 +305,139 @@ const DashboardPage = () => {
               {activeTab === 'profile' && (
                 <motion.div
                   key="profile"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="liquid-glass border-slate-100 p-10 rounded-[3rem]"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  className="liquid-glass border-slate-100 p-10 rounded-[3rem] relative overflow-hidden"
                 >
-                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-10">Define Identity.</h3>
-                  <form onSubmit={handleUpdateProfile} className="space-y-8">
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Full Name</label>
-                       <input 
-                         value={profileData.display_name}
-                         onChange={e => setProfileData({...profileData, display_name: e.target.value})}
-                         className="w-full bg-white border border-slate-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800"
-                       />
+                  {/* Holographic Success Overlay */}
+                  <AnimatePresence>
+                    {showSuccessAnim && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 z-20 flex items-center justify-center bg-rose-500/10 backdrop-blur-[2px] pointer-events-none"
+                      >
+                        <motion.div
+                          initial={{ scale: 0.5, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          className="flex flex-col items-center"
+                        >
+                          <div className="w-20 h-20 bg-rose-500 rounded-full flex items-center justify-center shadow-2xl shadow-rose-500/40 mb-4">
+                            <ShieldCheck size={40} className="text-white" />
+                          </div>
+                          <p className="text-rose-600 font-black uppercase tracking-[0.3em] text-xs">Identity Synchronized</p>
+                          <motion.div 
+                            animate={{ opacity: [0, 1, 0], scale: [1, 1.5, 2] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="absolute inset-0 bg-rose-500/20 rounded-full"
+                          />
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                    <div>
+                      <h3 className="text-3xl font-black tracking-tighter text-slate-900">Define Identity.</h3>
+                      <p className="text-slate-400 font-bold text-sm mt-2 flex items-center gap-2">
+                        <Zap size={14} className="text-rose-600" /> Biometric profile sync active
+                      </p>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Personal Mission / Bio</label>
-                      <textarea 
-                        rows={4}
-                        value={profileData.bio}
-                        onChange={e => setProfileData({...profileData, bio: e.target.value})}
-                        className="w-full bg-white border border-slate-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 resize-none"
-                        placeholder="State your physiological objectives..."
-                      />
+                    <div className="flex items-center gap-4 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Mainframe Connected</span>
                     </div>
-                    <button 
-                      type="submit"
-                      disabled={isUpdatingProfile}
-                      className="bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all disabled:opacity-50"
-                    >
-                      {isUpdatingProfile ? 'Syncing...' : 'Sync Identity'}
-                    </button>
+                  </div>
+
+                  <form onSubmit={handleUpdateProfile} className="space-y-10 relative">
+                    <div className="grid md:grid-cols-2 gap-10">
+                      <div className="space-y-3 group">
+                        <div className="flex justify-between items-center px-1">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                            <UserIcon size={12} className="text-rose-500" /> Global Descriptor
+                          </label>
+                          <span className="text-[8px] font-black text-emerald-500 uppercase opacity-0 group-focus-within:opacity-100 transition-opacity">Optimal</span>
+                        </div>
+                        <div className="relative">
+                          <input 
+                            value={profileData.display_name}
+                            onChange={e => setProfileData({...profileData, display_name: e.target.value})}
+                            className="w-full bg-white border-2 border-slate-100 rounded-3xl px-8 py-5 focus:outline-none focus:ring-8 focus:ring-rose-500/5 focus:border-rose-500 transition-all font-black text-slate-800 text-lg placeholder:text-slate-200"
+                            placeholder="Identify yourself..."
+                          />
+                          <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-20 group-focus-within:opacity-100 group-focus-within:text-rose-500 transition-all">
+                            <Activity size={20} />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 flex flex-col justify-end">
+                        <div className="p-6 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+                          <p className="text-[9px] font-black text-slate-400 leading-relaxed uppercase tracking-wider">
+                            Sync Status: <span className="text-slate-900">Encrypted</span><br/>
+                            Vulnerability Index: <span className="text-emerald-500">0.02%</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 group">
+                      <div className="flex justify-between items-center px-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                          <MessageSquare size={12} className="text-rose-500" /> Tactical Intent / Bio
+                        </label>
+                        <span className="text-[8px] font-black text-slate-300 uppercase">Limit: 256 Chars</span>
+                      </div>
+                      <div className="relative">
+                        <textarea 
+                          rows={4}
+                          value={profileData.bio}
+                          onChange={e => setProfileData({...profileData, bio: e.target.value})}
+                          className="w-full bg-white border-2 border-slate-100 rounded-[2.5rem] px-8 py-6 focus:outline-none focus:ring-8 focus:ring-rose-500/5 focus:border-rose-500 transition-all font-bold text-slate-700 leading-relaxed resize-none placeholder:text-slate-200"
+                          placeholder="State your physiological objectives and high-altitude mission goals..."
+                        />
+                         <div className="absolute right-6 bottom-6 opacity-20 group-focus-within:opacity-100 group-focus-within:text-rose-500 transition-all">
+                          <Settings size={20} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 flex flex-col sm:flex-row items-center gap-6">
+                      <button 
+                        type="submit"
+                        disabled={isUpdatingProfile}
+                        className="relative w-full sm:w-auto bg-slate-900 text-white px-12 py-6 rounded-3xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 hover:shadow-2xl hover:shadow-slate-900/20 active:scale-95 transition-all disabled:opacity-50 group overflow-hidden"
+                      >
+                        <span className="relative z-10 flex items-center gap-3">
+                          {isUpdatingProfile ? (
+                            <>
+                              <Activity className="animate-spin" size={18} />
+                              Syncing Identity...
+                            </>
+                          ) : (
+                            <>
+                              <Zap size={18} />
+                              Confirm Synchronization
+                            </>
+                          )}
+                        </span>
+                        {/* Scanning Line Animation */}
+                        {isUpdatingProfile && (
+                          <motion.div 
+                            initial={{ y: "-100%" }}
+                            animate={{ y: "100%" }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-0 bg-gradient-to-b from-transparent via-rose-500/20 to-transparent h-20 w-full"
+                          />
+                        )}
+                      </button>
+                      
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest max-w-[200px] leading-tight">
+                        Warning: Identity sync cannot be reverted within a 24h cycle once committed.
+                      </p>
+                    </div>
                   </form>
                 </motion.div>
               )}

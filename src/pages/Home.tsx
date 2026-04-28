@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { useModal } from '../context/ModalContext';
-import { supabase } from '../lib/supabase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { 
   Zap, 
   Target, 
@@ -200,19 +201,17 @@ export default function HomePage() {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const { data, error } = await supabase
-          .from('testimonials')
-          .select('*')
-          .lte('created_at', new Date().toISOString())
-          .order('created_at', { ascending: false })
-          .limit(6);
-
-        if (error) throw error;
+        const testimonialsRef = collection(db, 'testimonials');
+        const q = query(testimonialsRef, orderBy('created_at', 'desc'), limit(6));
+        const querySnapshot = await getDocs(q);
+        
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         if (data && data.length > 0) {
           setRealTestimonials(data);
         }
       } catch (e) {
         console.error("Testimonials fetch error:", e);
+        handleFirestoreError(e, OperationType.LIST, 'testimonials');
       }
     };
     fetchTestimonials();

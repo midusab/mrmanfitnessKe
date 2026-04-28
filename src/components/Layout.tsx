@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useModal } from '../context/ModalContext';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { supabase } from '../lib/supabase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 import { 
   Zap, 
   X, 
@@ -137,9 +138,10 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
 
     try {
       setStep(2);
-      const { error } = await supabase.from('bookings').insert([{
-        user_id: user.id,
-        user_name: formData.name || profile?.display_name || user.user_metadata.full_name || user.email?.split('@')[0],
+      const bookingsRef = collection(db, 'bookings');
+      await addDoc(bookingsRef, {
+        user_id: user.uid,
+        user_name: formData.name || profile?.display_name || user.displayName || user.email?.split('@')[0],
         email: formData.email || user.email,
         phone: formData.phone,
         location: formData.location,
@@ -148,9 +150,7 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
         activation_date: new Date(formData.date).toISOString(),
         status: 'pending',
         created_at: new Date().toISOString()
-      }]);
-
-      if (error) throw error;
+      }).catch(err => handleFirestoreError(err, OperationType.CREATE, 'bookings'));
 
       notify("Protocol initialized. Confirmation following bio-analysis.", "protocol");
 
@@ -400,9 +400,9 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
                className="hidden md:flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-full px-4 py-1.5 hover:bg-white transition-all shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-rose-600"
              >
                <div className="w-8 h-8 rounded-full overflow-hidden border border-white shadow-sm shrink-0">
-                 <img src={user.user_metadata.avatar_url || `https://ui-avatars.com/api/?name=${user.user_metadata.full_name || user.email}`} alt="User" className="w-full h-full object-cover" />
+                 <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`} alt="User" className="w-full h-full object-cover" />
                </div>
-               <span className="text-sm font-bold text-slate-800 hidden lg:block">{profile?.display_name || user.user_metadata.full_name || user.email?.split('@')[0]}</span>
+               <span className="text-sm font-bold text-slate-800 hidden lg:block">{profile?.display_name || user.displayName || user.email?.split('@')[0]}</span>
              </button>
             ) : (
               <button 
