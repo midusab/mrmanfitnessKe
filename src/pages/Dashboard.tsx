@@ -322,34 +322,6 @@ const DashboardPage = () => {
                     </div>
                   </div>
 
-                  {/* Inquiry Responses */}
-                  {inquiries.some(i => i.status === 'responded') && (
-                    <div className="bg-white border-2 border-emerald-100 p-10 rounded-[3rem] shadow-xl shadow-emerald-900/5">
-                      <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-8 flex items-center gap-3">
-                        <MessageSquare className="text-emerald-600" size={24} /> Inquiry Intelligence
-                      </h3>
-                      <div className="space-y-6">
-                        {inquiries.filter(i => i.status === 'responded').map(inquiry => (
-                          <div key={inquiry.id} className="bg-slate-50 p-8 rounded-3xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-2 h-full bg-emerald-500" />
-                            <div className="mb-4">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Your Inquiry</p>
-                              <p className="text-slate-600 font-medium italic">"{inquiry.message}"</p>
-                            </div>
-                            <div className="bg-white p-6 rounded-2xl border border-emerald-50 shadow-sm">
-                              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <ShieldCheck size={12} /> Official Response
-                              </p>
-                              <p className="text-slate-800 font-bold leading-relaxed">{inquiry.admin_response}</p>
-                              <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-4">
-                                Responded at: {new Date(inquiry.responded_at).toLocaleString()}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </motion.div>
               )}
 
@@ -579,22 +551,70 @@ const DashboardPage = () => {
                   exit={{ opacity: 0, y: -10 }}
                   className="liquid-glass border-slate-100 p-10 rounded-[3rem]"
                 >
-                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-10">System Updates.</h3>
-                  <div className="space-y-8">
-                     {updates.length > 0 ? updates.map(update => (
-                       <div key={update.id} className="relative pl-8 before:absolute before:left-0 before:top-2 before:bottom-0 before:w-0.5 before:bg-blue-100">
-                         <div className="absolute left-[-4px] top-2 w-2.5 h-2.5 rounded-full bg-blue-600" />
-                        <h5 className="font-black text-lg text-slate-900 mb-2">{update.title}</h5>
-                        <p className="text-slate-600 leading-relaxed mb-4">{update.content}</p>
-                         <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            <span>{new Date(update.created_at).toLocaleString()}</span>
-                            <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                            <span className="text-blue-600">Admin Post</span>
+                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-10 flex items-center gap-3">
+                    <Bell className="text-emerald-600" size={24} /> System & Personal Updates.
+                  </h3>
+                  
+                  <div className="space-y-12">
+                    {/* Inquiry Responses (Personal Updates) */}
+                    {inquiries.filter(i => i.status === 'responded').length > 0 && (
+                      <div className="space-y-6">
+                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Direct Intelligence</h4>
+                        {inquiries.filter(i => i.status === 'responded').map(inquiry => (
+                          <div key={inquiry.id} className="bg-white p-8 rounded-[2.5rem] border-2 border-emerald-100 shadow-xl shadow-emerald-900/5 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-1.5 h-full bg-emerald-500" />
+                            <div className="flex items-center gap-3 mb-6">
+                              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                <MessageSquare size={18} />
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Personal Response</p>
+                                <p className="text-sm font-bold text-slate-900">RE: Your Transformation Inquiry</p>
+                              </div>
+                            </div>
+                            <div className="mb-6">
+                              <p className="text-xs text-slate-400 font-bold uppercase mb-2">Original Message</p>
+                              <p className="text-slate-600 font-medium italic bg-slate-50 p-4 rounded-xl border border-slate-100">"{inquiry.message}"</p>
+                            </div>
+                            <div className="bg-slate-900 p-6 rounded-2xl text-white shadow-lg">
+                              <div className="flex items-center gap-2 mb-3">
+                                <ShieldCheck size={14} className="text-emerald-400" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Official Protocol</span>
+                              </div>
+                              <p className="text-sm font-medium leading-relaxed">{inquiry.admin_response}</p>
+                            </div>
+                            <div className="mt-6 flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                               <span>Transmitted: {new Date(inquiry.responded_at).toLocaleString()}</span>
+                               <span className="text-emerald-500">Verified</span>
+                            </div>
                           </div>
+                        ))}
                       </div>
-                    )) : (
-                      <div className="text-center py-12 text-slate-400 font-medium">No new updates.</div>
                     )}
+
+                    {/* System Updates */}
+                    <div className="space-y-6">
+                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Broadcast Intelligence</h4>
+                      {updates.length > 0 ? updates.map(update => (
+                        <div key={update.id} className="relative pl-10 before:absolute before:left-[19px] before:top-8 before:bottom-[-24px] before:w-px before:bg-slate-100 last:before:hidden">
+                          <div className="absolute left-0 top-0 w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center z-10 border border-blue-100">
+                            <Zap size={18} />
+                          </div>
+                          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+                            <h5 className="font-black text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">{update.title}</h5>
+                            <p className="text-slate-500 text-sm leading-relaxed mb-4">{update.content}</p>
+                            <div className="flex items-center gap-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                              <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded-md">{update.program_type || 'General'}</span>
+                              <span>{new Date(update.created_at).toLocaleString()}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )) : (
+                        <div className="text-center py-12 text-slate-400 font-medium bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
+                          No broadcast updates available.
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               )}
