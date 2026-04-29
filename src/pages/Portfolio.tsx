@@ -10,8 +10,10 @@ import {
   TrendingUp, 
   Users,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Fingerprint
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const transformations = [
   {
@@ -65,10 +67,19 @@ const testimonials = [
 ];
 
 export default function PortfolioPage() {
-  const { setIsBookingModalOpen } = useModal();
+  const { setIsBookingModalOpen, setIsAuthModalOpen } = useModal();
+  const { user } = useAuth();
+
+  const handleBookingClick = () => {
+    if (user) {
+      setIsBookingModalOpen(true);
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
 
   return (
-    <div className="pt-40 pb-20 px-6 max-w-7xl mx-auto">
+    <div className="relative pt-40 pb-20 px-6 max-w-7xl mx-auto">
       {/* Header */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -147,7 +158,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="liquid-glass p-12 md:p-24 rounded-[4rem] text-center relative overflow-hidden border-emerald-50 shadow-2xl">
+      <section className="liquid-glass p-12 md:p-24 rounded-[4rem] text-center relative overflow-hidden border-blue-50 shadow-2xl">
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-[10px] font-black text-white mb-8 rounded-full">
             <Zap size={14} fill="white" /> Join The Ranks
@@ -157,7 +168,7 @@ export default function PortfolioPage() {
             Every elite transformation starts with a single session. Commit to the plan and witness your own evolution.
           </p>
           <button 
-            onClick={() => setIsBookingModalOpen(true)}
+            onClick={handleBookingClick}
             className="bg-rose-600 text-white px-12 py-6 rounded-2xl font-black text-lg transition-all shadow-2xl shadow-rose-600/30 hover:bg-rose-700 active:scale-95 uppercase tracking-widest flex items-center justify-center gap-4 mx-auto"
           >
             Start Your Plan <ChevronRight size={20} />

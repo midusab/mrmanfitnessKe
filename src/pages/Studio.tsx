@@ -11,8 +11,10 @@ import {
   Coffee, 
   Maximize2,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Fingerprint
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const StudioZone = ({ title, description, image, features, delay }: { title: string, description: string, image: string, features: string[], delay: number, key?: any }) => (
   <motion.div
@@ -20,7 +22,7 @@ const StudioZone = ({ title, description, image, features, delay }: { title: str
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.8, delay }}
-    className="group relative overflow-hidden rounded-[3rem] liquid-glass border-blue-50 hover:border-blue-200 transition-all duration-700 min-h-[600px] flex flex-col"
+    className="group relative overflow-hidden rounded-[3rem] liquid-glass border-emerald-50 hover:border-emerald-200 transition-all duration-700 min-h-[600px] flex flex-col"
   >
     <div className="absolute inset-0 z-0">
       <img src={image} alt={title} className="w-full h-full object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110" referrerPolicy="no-referrer" />
@@ -58,7 +60,16 @@ const StudioZone = ({ title, description, image, features, delay }: { title: str
 );
 
 export default function StudioPage() {
-  const { setIsBookingModalOpen } = useModal();
+  const { setIsBookingModalOpen, setIsAuthModalOpen } = useModal();
+  const { user } = useAuth();
+
+  const handleBookingClick = () => {
+    if (user) {
+      setIsBookingModalOpen(true);
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
   const zones = [
     {
       title: "The Iron Sanctum",
@@ -84,7 +95,7 @@ export default function StudioPage() {
   ];
 
   return (
-    <div className="pt-40 pb-20 px-6 max-w-7xl mx-auto">
+    <div className="relative pt-40 pb-20 px-6 max-w-7xl mx-auto">
       {/* Header Section */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -106,7 +117,7 @@ export default function StudioPage() {
       <div className="grid md:grid-cols-3 gap-8 mb-32">
         {[
           { icon: ShieldCheck, title: "Private Access", desc: "Limited membership for maximum focus.", color: "rose" },
-          { icon: Maximize2, title: "Elite Gear", desc: "Sourced from the world's leading brands.", color: "rose" },
+          { icon: Maximize2, title: "Elite Gear", desc: "Sourced from the world's leading brands.", color: "blue" },
           { icon: Coffee, title: "Recovery Lounge", desc: "Post-training metabolic refueling.", color: "emerald" }
         ].map((item, i) => (
           <motion.div 
@@ -115,9 +126,17 @@ export default function StudioPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
-            className={`liquid-glass border-slate-100 p-8 rounded-3xl group hover:bg-slate-50 transition-colors border-l-4 ${item.color === 'rose' ? 'border-l-rose-500' : 'border-l-emerald-500'}`}
+            className={`liquid-glass border-slate-100 p-8 rounded-3xl group hover:bg-slate-50 transition-colors border-l-4 ${
+              item.color === 'rose' ? 'border-l-rose-500' : 
+              item.color === 'blue' ? 'border-l-blue-500' : 
+              'border-l-emerald-500'
+            }`}
           >
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-lg transition-transform group-hover:scale-110 ${item.color === 'rose' ? 'bg-rose-600 text-white shadow-rose-600/20' : 'bg-emerald-600 text-white shadow-emerald-600/20'}`}>
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-lg transition-transform group-hover:scale-110 ${
+              item.color === 'rose' ? 'bg-rose-600 text-white shadow-rose-600/20' : 
+              item.color === 'blue' ? 'bg-blue-600 text-white shadow-blue-600/20' : 
+              'bg-emerald-600 text-white shadow-emerald-600/20'
+            }`}>
               <item.icon size={24} />
             </div>
             <h3 className="text-xl font-black text-slate-800 mb-2">{item.title}</h3>
@@ -145,13 +164,13 @@ export default function StudioPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
              <button 
-              onClick={() => setIsBookingModalOpen(true)}
-              className="bg-rose-600 text-white px-12 py-6 rounded-2xl font-black text-lg transition-all shadow-2xl shadow-rose-600/30 hover:bg-rose-700 active:scale-95 uppercase tracking-widest"
+              onClick={handleBookingClick}
+              className="bg-blue-600 text-white px-12 py-6 rounded-2xl font-black text-lg transition-all shadow-2xl shadow-blue-600/30 hover:bg-blue-700 active:scale-95 uppercase tracking-widest"
             >
               Book Session
             </button>
             <div className="inline-flex items-center gap-4 px-8 py-5 text-slate-400 font-bold bg-slate-50 rounded-2xl border border-slate-100">
-               <MapPin size={20} className="text-rose-500" /> Milimani, Nakuru
+               <MapPin size={20} className="text-blue-500" /> Milimani, Nakuru
             </div>
           </div>
         </div>

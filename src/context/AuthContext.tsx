@@ -24,7 +24,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (currentUser) {
         // Fetch or create profile
-        await ensureProfile(currentUser);
+        try {
+          await ensureProfile(currentUser);
+        } catch (e) {
+          console.error("Profile synchronization error:", e);
+          // Don't block the UI if profile creation fails (e.g. adblocker)
+          setLoading(false);
+        }
         
         // Real-time profile sync
         const profileRef = doc(db, 'profiles', currentUser.uid);
@@ -34,7 +40,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           setLoading(false);
         }, (error) => {
+          console.error("Profile snapshot error:", error);
           handleFirestoreError(error, OperationType.GET, `profiles/${currentUser.uid}`);
+          setLoading(false);
         });
 
         return () => unsubProfile();
@@ -75,7 +83,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
     } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, `profiles/${firebaseUser.uid}`);
+      console.warn("Could not ensure profile existence. This is likely due to an AdBlocker or restrictive network policy blocking the database write.", error);
+      // We don't rethrow here to allow the user to at least enter the app
     }
   };
 

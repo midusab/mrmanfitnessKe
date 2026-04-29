@@ -58,7 +58,7 @@ export default function App() {
               className="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center gap-6"
             >
               <div className="relative">
-                <LoadingSpinner size={64} color="#2563eb" />
+                <LoadingSpinner size={64} />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                   <span className="text-[10px] font-black text-blue-600">MRM</span>
                 </div>

@@ -18,6 +18,7 @@ import { useNotification } from '../context/NotificationContext';
 import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { collection, query, where, getDocs, orderBy, limit, doc, updateDoc, addDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { LoadingSpinner } from '../components/SharedUI';
 
 const DashboardPage = () => {
   const { user, profile, logOut, loading: authLoading } = useAuth();
@@ -158,7 +159,7 @@ const DashboardPage = () => {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen pt-32 flex items-center justify-center">
-        <Activity className="animate-spin text-rose-500" size={48} />
+        <LoadingSpinner size={48} />
       </div>
     );
   }
@@ -166,7 +167,7 @@ const DashboardPage = () => {
   const completedBookings = bookings.filter(b => b.status === 'completed');
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pt-32 pb-20 px-4 sm:px-6">
+    <div className="relative min-h-screen bg-slate-50/50 pt-32 pb-20 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-4 gap-8">
           
@@ -200,10 +201,10 @@ const DashboardPage = () => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${
-                      activeTab === tab.id 
-                        ? 'bg-slate-900 text-white shadow-lg translate-x-2' 
-                        : 'text-slate-500 hover:bg-slate-100'
-                    }`}
+                    activeTab === tab.id 
+                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' 
+                    : 'text-slate-500 hover:bg-slate-50'
+                  }`}
                   >
                     <tab.icon size={20} />
                     {tab.label}
@@ -214,7 +215,7 @@ const DashboardPage = () => {
               <div className="mt-12 pt-8 border-t border-slate-100">
                 <button 
                   onClick={logOut}
-                  className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-rose-600 hover:bg-rose-50 transition-all"
+                  className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-emerald-600 hover:bg-emerald-50 transition-all"
                 >
                   <LogOut size={20} />
                   Sign Out
@@ -223,7 +224,6 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="lg:col-span-3 space-y-8">
             <AnimatePresence mode="wait">
               {activeTab === 'overview' && (
@@ -236,7 +236,7 @@ const DashboardPage = () => {
                 >
                   <div className="grid md:grid-cols-3 gap-6">
                     <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                      <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
+                      <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
                         <Activity size={24} />
                       </div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active Workouts</p>
@@ -245,7 +245,7 @@ const DashboardPage = () => {
                       </h4>
                     </div>
                     <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                      <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-6">
+                      <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
                         <Calendar size={24} />
                       </div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Sessions</p>
@@ -262,10 +262,9 @@ const DashboardPage = () => {
 
                   <div className="liquid-glass border-slate-100 p-10 rounded-[3rem]">
                     <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-8 flex items-center gap-3">
-                      <Bell className="text-rose-600" size={24} /> Latest Updates
+                      <Bell className="text-emerald-600" size={24} /> Latest Updates
                     </h3>
 
-                    {/* Developer Simulation Controls */}
                     {user?.email === 'bochieng228@gmail.com' && (
                       <div className="mb-8 p-6 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Developer Simulation (Test Mode)</p>
@@ -274,7 +273,7 @@ const DashboardPage = () => {
                             onClick={simulateUpdate}
                             className="text-xs font-bold px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition-all flex items-center gap-2"
                           >
-                            <Zap size={14} className="text-rose-600" /> Post System Update
+                            <Zap size={14} className="text-emerald-600" /> Post System Update
                           </button>
                         </div>
                       </div>
@@ -286,7 +285,7 @@ const DashboardPage = () => {
                           <h5 className="font-black text-slate-800 mb-2">{update.title}</h5>
                            <p className="text-slate-500 text-sm leading-relaxed">{update.content}</p>
                           <div className="mt-4 flex items-center gap-4">
-                           <span className="text-[9px] font-black text-rose-600 uppercase bg-rose-50 px-2 py-1 rounded-md">
+                           <span className="text-[9px] font-black text-emerald-600 uppercase bg-emerald-50 px-2 py-1 rounded-md">
                                {update.program_type || 'General'}
                              </span>
                              <span className="text-[9px] font-black text-slate-400 uppercase">
@@ -302,145 +301,146 @@ const DashboardPage = () => {
                 </motion.div>
               )}
 
-              {activeTab === 'profile' && (
-                <motion.div
-                  key="profile"
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.98 }}
-                  className="liquid-glass border-slate-100 p-10 rounded-[3rem] relative overflow-hidden"
-                >
-                  {/* Holographic Success Overlay */}
-                  <AnimatePresence>
-                    {showSuccessAnim && (
-                      <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 z-20 flex items-center justify-center bg-rose-500/10 backdrop-blur-[2px] pointer-events-none"
-                      >
-                        <motion.div
-                          initial={{ scale: 0.5, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          className="flex flex-col items-center"
-                        >
-                          <div className="w-20 h-20 bg-rose-500 rounded-full flex items-center justify-center shadow-2xl shadow-rose-500/40 mb-4">
-                            <ShieldCheck size={40} className="text-white" />
+               {activeTab === 'profile' && (
+                 <motion.div
+                   key="profile"
+                   initial={{ opacity: 0, y: 10 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   exit={{ opacity: 0, y: -10 }}
+                   className="space-y-8"
+                 >
+                   {/* Profile Header Card */}
+                   <div className="bg-white rounded-[3rem] overflow-hidden shadow-xl shadow-slate-900/5 border border-slate-100 relative">
+                     {/* Banner */}
+                     <div className="h-48 w-full relative overflow-hidden bg-slate-900">
+                       <img 
+                         src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200" 
+                         className="w-full h-full object-cover opacity-40 grayscale"
+                         alt="Banner"
+                       />
+                       <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
+                     </div>
+                     
+                     <div className="px-10 pb-10 -mt-16 relative z-10">
+                       <div className="flex flex-col md:flex-row items-end gap-6 mb-8">
+                         <div className="w-32 h-32 rounded-[2.5rem] bg-white p-2 shadow-2xl relative group">
+                           <div className="w-full h-full rounded-[2rem] overflow-hidden">
+                             <img 
+                               src={user?.photoURL || `https://ui-avatars.com/api/?name=${user?.displayName || user?.email}&background=0D9488&color=fff`} 
+                               alt="Avatar" 
+                               className="w-full h-full object-cover"
+                             />
+                           </div>
+                           <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white border-4 border-white shadow-lg">
+                             <Fingerprint size={18} />
+                           </div>
+                         </div>
+                         <div className="flex-1 pb-2">
+                           <h2 className="text-4xl font-black tracking-tighter text-slate-900 leading-none">
+                             {profile?.display_name || user?.displayName || user?.email?.split('@')[0]}
+                           </h2>
+                           <p className="text-slate-400 font-bold text-sm mt-2 flex items-center gap-2">
+                             Member since {new Date(user?.metadata.creationTime || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                           </p>
+                         </div>
+                         <div className="flex gap-3">
+                            <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 text-[10px] font-black uppercase tracking-widest">
+                              {profile?.role || 'Elite Member'}
+                            </div>
+                         </div>
+                       </div>
+
+                       {/* Profile Info Grid */}
+                       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-10 border-t border-slate-50">
+                          <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Account ID</p>
+                            <p className="text-sm font-bold text-slate-800 font-mono truncate max-w-[120px]">{user?.uid}</p>
                           </div>
-                          <p className="text-rose-600 font-black uppercase tracking-[0.3em] text-xs">Profile Saved</p>
-                          <motion.div 
-                            animate={{ opacity: [0, 1, 0], scale: [1, 1.5, 2] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="absolute inset-0 bg-rose-500/20 rounded-full"
-                          />
-                        </motion.div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                    <div>
-                      <h3 className="text-3xl font-black tracking-tighter text-slate-900">Edit Profile.</h3>
-                      <p className="text-slate-400 font-bold text-sm mt-2 flex items-center gap-2">
-                        <Zap size={14} className="text-rose-600" /> Profile sync active
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-4 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">System Connected</span>
-                    </div>
-                  </div>
-
-                  <form onSubmit={handleUpdateProfile} className="space-y-10 relative">
-                    <div className="grid md:grid-cols-2 gap-10">
-                      <div className="space-y-3 group">
-                        <div className="flex justify-between items-center px-1">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                            <UserIcon size={12} className="text-rose-500" /> Full Name
-                          </label>
-                          <span className="text-[8px] font-black text-emerald-500 uppercase opacity-0 group-focus-within:opacity-100 transition-opacity">Optimal</span>
-                        </div>
-                        <div className="relative">
-                          <input 
-                            value={profileData.display_name}
-                            onChange={e => setProfileData({...profileData, display_name: e.target.value})}
-                            className="w-full bg-white border-2 border-slate-100 rounded-3xl px-8 py-5 focus:outline-none focus:ring-8 focus:ring-rose-500/5 focus:border-rose-500 transition-all font-black text-slate-800 text-lg placeholder:text-slate-200"
-                            placeholder="Identify yourself..."
-                          />
-                          <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-20 group-focus-within:opacity-100 group-focus-within:text-rose-500 transition-all">
-                            <Activity size={20} />
+                          <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Email Access</p>
+                            <p className="text-sm font-bold text-slate-800">{user?.email}</p>
                           </div>
-                        </div>
-                      </div>
+                          <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Last Protocol</p>
+                            <p className="text-sm font-bold text-slate-800">{bookings[0]?.protocol || 'None Active'}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">System Status</p>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                              <span className="text-sm font-bold text-emerald-600">Online</span>
+                            </div>
+                          </div>
+                       </div>
+                     </div>
+                   </div>
 
-                      <div className="space-y-3 flex flex-col justify-end">
-                        <div className="p-6 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
-                          <p className="text-[9px] font-black text-slate-400 leading-relaxed uppercase tracking-wider">
-                            Sync Status: <span className="text-slate-900">Secure</span><br/>
-                            Stability Index: <span className="text-emerald-500">99.98%</span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                   {/* Settings Form Card */}
+                   <div className="bg-white rounded-[3rem] p-10 shadow-xl shadow-slate-900/5 border border-slate-100">
+                     <div className="flex items-center gap-4 mb-10">
+                       <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center">
+                         <Settings size={20} />
+                       </div>
+                       <div>
+                         <h3 className="text-2xl font-black tracking-tighter text-slate-900">System Preferences</h3>
+                         <p className="text-slate-400 font-medium text-xs">Update your identification and objectives.</p>
+                       </div>
+                     </div>
 
-                    <div className="space-y-3 group">
-                      <div className="flex justify-between items-center px-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                          <MessageSquare size={12} className="text-rose-500" /> About Me & Goals
-                        </label>
-                        <span className="text-[8px] font-black text-slate-300 uppercase">Limit: 256 Chars</span>
-                      </div>
-                      <div className="relative">
-                        <textarea 
-                          rows={4}
-                          value={profileData.bio}
-                          onChange={e => setProfileData({...profileData, bio: e.target.value})}
-                          className="w-full bg-white border-2 border-slate-100 rounded-[2.5rem] px-8 py-6 focus:outline-none focus:ring-8 focus:ring-rose-500/5 focus:border-rose-500 transition-all font-bold text-slate-700 leading-relaxed resize-none placeholder:text-slate-200"
-                          placeholder="Tell us about your fitness goals..."
-                        />
-                         <div className="absolute right-6 bottom-6 opacity-20 group-focus-within:opacity-100 group-focus-within:text-rose-500 transition-all">
-                          <Settings size={20} />
-                        </div>
-                      </div>
-                    </div>
+                     <form onSubmit={handleUpdateProfile} className="space-y-10">
+                       <div className="grid md:grid-cols-2 gap-10">
+                         <div className="space-y-3 group">
+                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 pl-1">
+                             <UserIcon size={12} className="text-emerald-500" /> Full Name
+                           </label>
+                           <input 
+                             value={profileData.display_name}
+                             onChange={e => setProfileData({...profileData, display_name: e.target.value})}
+                             className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 focus:bg-white transition-all font-bold text-slate-800 placeholder:text-slate-300"
+                             placeholder="Display Name"
+                           />
+                         </div>
+                         <div className="space-y-3 group">
+                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 pl-1">
+                             <Zap size={12} className="text-emerald-500" /> Role Identity
+                           </label>
+                           <input 
+                             disabled
+                             value={profile?.role || 'Elite Member'}
+                             className="w-full bg-slate-100 border-2 border-slate-100 rounded-2xl px-6 py-4 font-bold text-slate-400 cursor-not-allowed"
+                           />
+                         </div>
+                       </div>
 
-                    <div className="pt-4 flex flex-col sm:flex-row items-center gap-6">
-                      <button 
-                        type="submit"
-                        disabled={isUpdatingProfile}
-                        className="relative w-full sm:w-auto bg-slate-900 text-white px-12 py-6 rounded-3xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 hover:shadow-2xl hover:shadow-slate-900/20 active:scale-95 transition-all disabled:opacity-50 group overflow-hidden"
-                      >
-                        <span className="relative z-10 flex items-center gap-3">
-                          {isUpdatingProfile ? (
-                            <>
-                              <Activity className="animate-spin" size={18} />
-                              Saving Profile...
-                            </>
-                          ) : (
-                            <>
-                              <Zap size={18} />
-                              Save Changes
-                            </>
-                          )}
-                        </span>
-                        {/* Scanning Line Animation */}
-                        {isUpdatingProfile && (
-                          <motion.div 
-                            initial={{ y: "-100%" }}
-                            animate={{ y: "100%" }}
-                            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-0 bg-gradient-to-b from-transparent via-rose-500/20 to-transparent h-20 w-full"
-                          />
-                        )}
-                      </button>
-                      
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest max-w-[200px] leading-tight">
-                        Note: Profile changes are saved to the secure system immediately.
-                      </p>
-                    </div>
-                  </form>
-                </motion.div>
-              )}
+                       <div className="space-y-3 group">
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 pl-1">
+                           <MessageSquare size={12} className="text-emerald-500" /> Personal Objectives
+                         </label>
+                         <textarea 
+                           rows={4}
+                           value={profileData.bio}
+                           onChange={e => setProfileData({...profileData, bio: e.target.value})}
+                           className="w-full bg-slate-50 border-2 border-slate-50 rounded-[2rem] px-6 py-5 focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 focus:bg-white transition-all font-bold text-slate-700 leading-relaxed resize-none placeholder:text-slate-300"
+                           placeholder="Describe your current fitness trajectory..."
+                         />
+                       </div>
+
+                       <div className="pt-4 flex flex-col sm:flex-row items-center gap-6 border-t border-slate-50 pt-10">
+                         <button 
+                           type="submit"
+                           disabled={isUpdatingProfile}
+                           className="w-full sm:w-auto bg-slate-900 text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-600 hover:shadow-2xl hover:shadow-emerald-600/20 active:scale-95 transition-all disabled:opacity-50"
+                         >
+                           {isUpdatingProfile ? "Syncing..." : "Update Protocol"}
+                         </button>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest max-w-[200px] leading-tight">
+                           Authentication verified. All changes are immutable once committed.
+                         </p>
+                       </div>
+                     </form>
+                   </div>
+                 </motion.div>
+               )}
 
               {activeTab === 'bookings' && (
                 <motion.div
@@ -461,7 +461,7 @@ const DashboardPage = () => {
                               <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-md ${
                                 booking.status === 'confirmed' ? 'bg-emerald-50 text-emerald-600' :
                                 booking.status === 'pending' ? 'bg-amber-50 text-amber-600' :
-                                booking.status === 'completed' ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-400'
+                                booking.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400'
                               }`}>
                                 {booking.status}
                               </span>
@@ -472,34 +472,33 @@ const DashboardPage = () => {
                           </div>
 
                           {booking.status === 'completed' && (
-                            <div className="w-full md:w-auto p-6 bg-rose-50/50 rounded-2xl border border-rose-100">
-                              <h6 className="text-[10px] font-black text-rose-600 uppercase mb-3 flex items-center gap-2">
-                                <Star size={12} fill="currentColor" /> Share Your Story
-                              </h6>
-                              <div className="flex gap-2">
-                                <input 
-                                  placeholder="How was your progress?"
-                                  value={testimonialQuote}
-                                  onChange={e => setTestimonialQuote(e.target.value)}
-                                  className="flex-1 bg-white border border-rose-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20"
-                                />
-                                <button 
-                                  onClick={() => handleSubmitTestimonial(booking.id)}
-                                  disabled={isSubmittingTestimonial === booking.id}
-                                  className="bg-rose-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg shadow-rose-600/20 hover:bg-rose-700 transition-all"
-                                >
-                                  {isSubmittingTestimonial === booking.id ? '...' : 'Post'}
-                                </button>
-                              </div>
-                            </div>
-                          )}
+                             <div className="w-full md:w-auto p-6 bg-emerald-50/50 rounded-2xl border border-emerald-100">
+                               <h6 className="text-[10px] font-black text-emerald-600 uppercase mb-3 flex items-center gap-2">
+                                 <Star size={12} fill="currentColor" /> Share Your Story
+                               </h6>
+                               <div className="flex gap-2">
+                                 <input 
+                                   placeholder="How was your progress?"
+                                   value={testimonialQuote}
+                                   onChange={e => setTestimonialQuote(e.target.value)}
+                                   className="flex-1 bg-white border border-emerald-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                 />
+                                 <button 
+                                   onClick={() => handleSubmitTestimonial(booking.id)}
+                                   disabled={isSubmittingTestimonial === booking.id}
+                                   className="bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all"
+                                 >
+                                   {isSubmittingTestimonial === booking.id ? '...' : 'Post'}
+                                 </button>
+                               </div>
+                             </div>
+                           )}
 
-                          {/* Simulation: Mark as Completed */}
                           {user?.email === 'bochieng228@gmail.com' && booking.status !== 'completed' && (
-                            <button 
-                              onClick={() => simulateCompletion(booking.id)}
-                              className="text-[9px] font-black uppercase text-slate-400 hover:text-rose-600 transition-colors mt-2"
-                            >
+                             <button 
+                               onClick={() => simulateCompletion(booking.id)}
+                               className="text-[9px] font-black uppercase text-slate-400 hover:text-emerald-600 transition-colors mt-2"
+                             >
                               [Simulate Completion]
                             </button>
                           )}
@@ -507,10 +506,10 @@ const DashboardPage = () => {
                       )) : (
                         <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
                           <p className="text-slate-400 font-bold">No active plans detected.</p>
-                          <button 
-                            onClick={() => navigate('/programs')}
-                            className="mt-4 text-rose-600 font-black text-sm uppercase tracking-widest hover:underline"
-                          >
+                           <button 
+                             onClick={() => navigate('/programs')}
+                             className="mt-4 text-blue-600 font-black text-sm uppercase tracking-widest hover:underline"
+                           >
                             Explore Training Plans
                           </button>
                         </div>
@@ -530,16 +529,16 @@ const DashboardPage = () => {
                 >
                   <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-10">System Updates.</h3>
                   <div className="space-y-8">
-                    {updates.length > 0 ? updates.map(update => (
-                      <div key={update.id} className="relative pl-8 before:absolute before:left-0 before:top-2 before:bottom-0 before:w-0.5 before:bg-rose-100">
-                        <div className="absolute left-[-4px] top-2 w-2.5 h-2.5 rounded-full bg-rose-600" />
+                     {updates.length > 0 ? updates.map(update => (
+                       <div key={update.id} className="relative pl-8 before:absolute before:left-0 before:top-2 before:bottom-0 before:w-0.5 before:bg-blue-100">
+                         <div className="absolute left-[-4px] top-2 w-2.5 h-2.5 rounded-full bg-blue-600" />
                         <h5 className="font-black text-lg text-slate-900 mb-2">{update.title}</h5>
                         <p className="text-slate-600 leading-relaxed mb-4">{update.content}</p>
                          <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                           <span>{new Date(update.created_at).toLocaleString()}</span>
-                           <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                           <span className="text-rose-600">Admin Post</span>
-                         </div>
+                            <span>{new Date(update.created_at).toLocaleString()}</span>
+                            <span className="w-1 h-1 bg-slate-300 rounded-full" />
+                            <span className="text-blue-600">Admin Post</span>
+                          </div>
                       </div>
                     )) : (
                       <div className="text-center py-12 text-slate-400 font-medium">No new updates.</div>

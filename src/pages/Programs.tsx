@@ -12,8 +12,10 @@ import {
   CheckCircle2, 
   Timer, 
   Flame, 
-  Scale
+  Scale,
+  Fingerprint
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const ProgramDetailCard = ({ 
   icon: Icon, 
@@ -23,7 +25,8 @@ const ProgramDetailCard = ({
   intensity, 
   duration, 
   image,
-  delay 
+  delay,
+  color
 }: { 
   icon: any, 
   title: string, 
@@ -33,16 +36,30 @@ const ProgramDetailCard = ({
   duration: string,
   image: string,
   delay: number,
+  color: 'blue' | 'rose' | 'emerald',
   key?: any 
 }) => {
-  const { setIsBookingModalOpen } = useModal();
+  const { setIsBookingModalOpen, setIsAuthModalOpen } = useModal();
+  const { user } = useAuth();
+  
+  const handleBooking = () => {
+    if (user) {
+      setIsBookingModalOpen(true);
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.8, delay }}
-      className="liquid-glass rounded-[3rem] border border-blue-50 group hover:border-blue-200 transition-all duration-500 shadow-xl shadow-blue-900/5 relative overflow-hidden"
+      className={`liquid-glass rounded-[3rem] border transition-all duration-500 shadow-xl relative overflow-hidden ${
+        color === 'blue' ? 'border-blue-50 group hover:border-blue-200 shadow-blue-900/5' :
+        color === 'rose' ? 'border-rose-50 group hover:border-rose-200 shadow-rose-900/5' :
+        'border-emerald-50 group hover:border-emerald-200 shadow-emerald-900/5'
+      }`}
     >
       <div className="flex flex-col lg:flex-row">
         {/* Visual Section */}
@@ -54,7 +71,11 @@ const ProgramDetailCard = ({
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-white/5 shadow-inner hidden lg:block" />
-          <div className="absolute top-6 left-6 p-3 rounded-2xl bg-white/90 backdrop-blur-md text-blue-600 shadow-xl">
+          <div className={`absolute top-6 left-6 p-3 rounded-2xl bg-white/90 backdrop-blur-md shadow-xl ${
+            color === 'blue' ? 'text-blue-600' :
+            color === 'rose' ? 'text-rose-600' :
+            'text-emerald-600'
+          }`}>
             <Icon size={24} />
           </div>
         </div>
@@ -69,7 +90,11 @@ const ProgramDetailCard = ({
             <div>
               <h2 className="text-3xl font-black tracking-tighter text-slate-800 leading-none mb-2">{title}</h2>
               <div className="flex gap-4">
-                <span className="text-[10px] font-black uppercase text-rose-500 flex items-center gap-1">
+                <span className={`text-[10px] font-black uppercase flex items-center gap-1 ${
+                  color === 'rose' ? 'text-rose-500' :
+                  color === 'blue' ? 'text-blue-500' :
+                  'text-emerald-500'
+                }`}>
                   <Flame size={12} /> {intensity} Intensity
                 </span>
                 <span className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1">
@@ -80,10 +105,18 @@ const ProgramDetailCard = ({
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 min-w-[200px]">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-[9px] font-black uppercase text-slate-400">Technical Load</span>
-                <span className="text-[9px] font-black text-blue-600">85%</span>
+                <span className={`text-[9px] font-black ${
+                  color === 'blue' ? 'text-blue-600' :
+                  color === 'rose' ? 'text-rose-600' :
+                  'text-emerald-600'
+                }`}>85%</span>
               </div>
               <div className="w-full h-1 bg-slate-200 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-600 w-[85%]" />
+                <div className={`h-full w-[85%] ${
+                  color === 'blue' ? 'bg-blue-600' :
+                  color === 'rose' ? 'bg-rose-600' :
+                  'bg-emerald-600'
+                }`} />
               </div>
             </div>
           </div>
@@ -103,8 +136,12 @@ const ProgramDetailCard = ({
 
           <div className="pt-6">
             <button 
-              onClick={() => setIsBookingModalOpen(true)}
-              className="bg-rose-600 text-white font-black px-10 py-4 rounded-2xl text-xs hover:bg-rose-700 transition-all shadow-xl shadow-rose-900/10 flex items-center justify-center gap-2 group/btn uppercase tracking-widest"
+              onClick={handleBooking}
+              className={`font-black px-10 py-4 rounded-2xl text-xs transition-all shadow-xl flex items-center justify-center gap-2 group/btn uppercase tracking-widest text-white ${
+                color === 'blue' ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-900/10' :
+                color === 'rose' ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-900/10' :
+                'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-900/10'
+              }`}
             >
               Book Session <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
             </button>
@@ -116,7 +153,16 @@ const ProgramDetailCard = ({
 };
 
 export default function ProgramsPage() {
-  const { setIsBookingModalOpen } = useModal();
+  const { setIsBookingModalOpen, setIsAuthModalOpen } = useModal();
+  const { user } = useAuth();
+
+  const handleBookingClick = () => {
+    if (user) {
+      setIsBookingModalOpen(true);
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
   const programs = [
     {
       icon: Dumbbell,
@@ -126,7 +172,8 @@ export default function ProgramsPage() {
       image: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800",
       description: "Master the foundational movements that build absolute strength. We focus on the Big Three (Squat, Bench, Deadlift) and their variations through technical precision and neurological adaptation.",
       benefits: ["Maximal Strength Gain", "Bone Density Improvement", "Hormonal Optimization", "Structural Integrity"],
-      delay: 0.1
+      delay: 0.1,
+      color: 'rose' as const
     },
     {
       icon: Target,
@@ -136,7 +183,8 @@ export default function ProgramsPage() {
       image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800",
       description: "A comprehensive training plan designed for muscle growth and power production. We use structured models to ensure consistent progress without hitting plateaus.",
       benefits: ["Muscle Mass Growth", "Power Output", "Metabolic Flexibility", "Injury Resilience"],
-      delay: 0.2
+      delay: 0.2,
+      color: 'emerald' as const
     },
     {
       icon: Activity,
@@ -146,7 +194,8 @@ export default function ProgramsPage() {
       image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=800",
       description: "LISS (Low-Intensity Steady State) conditioning optimized for heart health and active recovery. Designed to build an aerobic base and improve systemic blood flow.",
       benefits: ["Aerobic Capacity", "Recovery Acceleration", "Stamina Development", "Endurance Base"],
-      delay: 0.3
+      delay: 0.3,
+      color: 'blue' as const
     },
     {
       icon: FruitIcon,
@@ -156,7 +205,8 @@ export default function ProgramsPage() {
       image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800",
       description: "One-on-one consultation focused on energy levels and nutritional optimization. We design your nutrition to match your training phases and lifestyle demands.",
       benefits: ["Metabolic Efficiency", "Macro-Nutrient Balance", "Cognitive Sharpness", "Peak Performance Fueling"],
-      delay: 0.4
+      delay: 0.4,
+      color: 'emerald' as const
     },
     {
       icon: TrendingDown,
@@ -166,7 +216,8 @@ export default function ProgramsPage() {
       image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800",
       description: "Scientific adipose reduction through caloric precision and thermogenic optimization. We focus on fat loss while strictly preserving lean muscle mass.",
       benefits: ["Body Fat Reduction", "Insulin Sensitivity", "Energy Consistency", "Systemic De-inflammation"],
-      delay: 0.5
+      delay: 0.5,
+      color: 'blue' as const
     },
     {
       icon: Zap,
@@ -176,18 +227,19 @@ export default function ProgramsPage() {
       image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800",
       description: "Strategic muscle building for those seeking to maximize their physical frame. We combine high-volume training with specialized fueling plans.",
       benefits: ["Mass Velocity", "Size Expansion", "Absolute Power", "Volume Threshold Increase"],
-      delay: 0.6
+      delay: 0.6,
+      color: 'rose' as const
     }
   ];
 
   return (
-    <div className="pt-40 pb-20 px-6 max-w-7xl mx-auto">
+    <div className="relative pt-40 pb-20 px-6 max-w-7xl mx-auto">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-24"
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-[10px] font-black text-blue-600 mb-6 rounded-full border border-blue-200">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-[10px] font-black text-blue-600 mb-6 rounded-full border border-blue-200 uppercase tracking-widest">
            Service Matrix 2026
         </div>
         <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 leading-[0.8] mb-8">
@@ -204,9 +256,9 @@ export default function ProgramsPage() {
         ))}
       </div>
 
-      <section className="mt-40 liquid-glass p-12 md:p-20 rounded-[4rem] text-center relative overflow-hidden border-blue-100 shadow-2xl">
+      <section className="mt-40 liquid-glass p-12 md:p-20 rounded-[4rem] text-center relative overflow-hidden border-rose-100 shadow-2xl">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-600 text-[10px] font-black text-white mb-8 rounded-full">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-rose-600 text-[10px] font-black text-white mb-8 rounded-full">
             <Zap size={12} fill="white" /> Biological Reserve
           </div>
           <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 leading-none mb-8">Not sure which path to choose?</h2>
@@ -214,7 +266,7 @@ export default function ProgramsPage() {
             Every body is unique. We recommend a full health assessment to determine the most efficient plan for your current fitness level.
           </p>
           <button 
-            onClick={() => setIsBookingModalOpen(true)}
+            onClick={handleBookingClick}
             className="bg-rose-600 text-white px-12 py-6 rounded-2xl font-black text-lg transition-all shadow-2xl shadow-rose-600/30 hover:bg-rose-700 active:scale-95 uppercase tracking-widest flex items-center justify-center gap-4 mx-auto"
           >
             Book Session <ChevronRight size={20} />

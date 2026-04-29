@@ -77,7 +77,7 @@ const DecryptedText: React.FC<DecryptedTextProps> = ({
       onViewportEnter={() => setIsRevealing(true)}
       {...props}
     >
-      <span className={className}>{displayText}</span>
+      <span className={`${className} inline-block min-w-max`}>{displayText}</span>
     </motion.span>
   );
 };

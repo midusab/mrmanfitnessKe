@@ -27,23 +27,23 @@ export const DashboardMetric = ({ label, value, trend, unit }: { label: string, 
   </div>
 );
 
-export const FeatureCard = ({ icon: Icon, title, description, delay, color = 'rose' }: { icon: any, title: string, description: string, delay: number, color?: 'blue' | 'rose' | 'emerald', key?: any }) => {
+export const FeatureCard = ({ icon: Icon, title, description, delay, color = 'emerald' }: { icon: any, title: string, description: string, delay: number, color?: 'blue' | 'rose' | 'emerald', key?: any }) => {
   const colorClasses = {
     blue: 'liquid-glass-blue hover:bg-blue-500/10 focus-visible:ring-blue-500 text-blue-600 group-hover:text-blue-700',
-    rose: 'liquid-glass-rose hover:bg-rose-500/10 focus-visible:ring-rose-500 text-rose-600 group-hover:text-rose-700',
+    rose: 'liquid-glass-emerald hover:bg-emerald-500/10 focus-visible:ring-emerald-500 text-emerald-600 group-hover:text-emerald-700',
     emerald: 'liquid-glass-emerald hover:bg-emerald-500/10 focus-visible:ring-emerald-500 text-emerald-600 group-hover:text-emerald-700'
   };
 
   const currentColors = colorClasses[color];
   const bgBadge = {
     blue: 'bg-blue-500/10',
-    rose: 'bg-rose-500/10',
+    rose: 'bg-emerald-500/10',
     emerald: 'bg-emerald-500/10'
   }[color];
 
   const textLink = {
     blue: 'text-blue-500 group-hover:text-blue-700 focus-visible:ring-blue-500',
-    rose: 'text-rose-500 group-hover:text-rose-700 focus-visible:ring-rose-500',
+    rose: 'text-emerald-500 group-hover:text-emerald-700 focus-visible:ring-emerald-500',
     emerald: 'text-emerald-500 group-hover:text-emerald-700 focus-visible:ring-emerald-500'
   }[color];
 
@@ -74,7 +74,7 @@ export const TestimonialCard = ({ name, quote, role, image, delay }: { name: str
     whileInView={{ opacity: 1, scale: 1 }}
     viewport={{ once: true }}
     transition={{ duration: 0.6, delay }}
-    className="liquid-glass p-8 rounded-[2.5rem] border border-emerald-100 flex flex-col gap-6 relative group"
+    className="liquid-glass p-8 rounded-[2.5rem] border border-emerald-100 flex flex-col gap-6 relative group cursor-pointer"
   >
     <div className="absolute top-6 right-8 text-emerald-500/10">
       <Quote size={40} />
@@ -114,7 +114,7 @@ export const TransformationCard = ({ name, result, duration, beforeImg, afterImg
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.8, delay }}
-    className="group relative h-[480px] rounded-3xl overflow-hidden liquid-glass border-emerald-100/50 shadow-2xl shadow-emerald-900/5"
+    className="group relative h-[480px] rounded-3xl overflow-hidden liquid-glass border-emerald-100/50 shadow-2xl shadow-emerald-900/5 cursor-pointer"
   >
     <img src={beforeImg} alt={`${name} before`} className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-1000 group-hover:opacity-0" />
     <img src={afterImg} alt={`${name} after`} className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-1000 scale-110 group-hover:scale-100" />
@@ -149,7 +149,7 @@ export const BlogCard = ({ title, category, date, image, delay }: { title: strin
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.8, delay }}
-    className="group liquid-glass rounded-xl overflow-hidden border-blue-50 hover:bg-blue-50/50 transition-all duration-500"
+    className="group liquid-glass rounded-xl overflow-hidden border-blue-50 hover:bg-blue-50/50 transition-all duration-500 cursor-pointer"
   >
     <div className="aspect-video overflow-hidden relative">
       <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -171,15 +171,21 @@ export const BlogCard = ({ title, category, date, image, delay }: { title: strin
   </motion.div>
 );
 
-export const LoadingSpinner = ({ size = 24, color = "currentColor" }: { size?: number, color?: string }) => (
+export const LoadingSpinner = ({ size = 24 }: { size?: number }) => (
   <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
     <motion.div
       animate={{ rotate: 360 }}
-      transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-      className="absolute inset-0 rounded-full border-2 border-slate-200"
-      style={{ borderTopColor: color }}
+      transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
+      className="absolute inset-0 rounded-full border-[3px] border-slate-100"
+      style={{ borderTopColor: '#2563eb' }} // blue-600
     />
-    <div className="w-1 h-1 bg-blue-600 rounded-full animate-pulse" />
+    <motion.div
+      animate={{ rotate: -360 }}
+      transition={{ repeat: Infinity, duration: 1.8, ease: "linear" }}
+      className="absolute inset-1.5 rounded-full border-[2px] border-transparent"
+      style={{ borderTopColor: '#e11d48' }} // rose-600
+    />
+    <div className="w-1 h-1 bg-blue-600 rounded-full shadow-[0_0_8px_rgba(37,99,235,0.5)]" />
   </div>
 );
 

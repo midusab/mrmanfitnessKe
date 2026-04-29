@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { useModal } from '../context/ModalContext';
+import { useNotification } from '../context/NotificationContext';
 import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { collection, query, orderBy, limit, getDocs, addDoc } from 'firebase/firestore';
 import { 
@@ -24,8 +25,10 @@ import {
   User,
   Play,
   ChevronDown,
-  LineChart as LineChartIcon
+  LineChart as LineChartIcon,
+  Fingerprint
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { 
   DashboardMetric, 
   FeatureCard, 
@@ -64,14 +67,23 @@ const pricingTiers = [
 ];
 
 const PricingCard = ({ tier, delay }: { tier: typeof pricingTiers[0], delay: number, key?: any }) => {
-  const { setIsBookingModalOpen } = useModal();
+  const { setIsBookingModalOpen, setIsAuthModalOpen } = useModal();
+  const { user } = useAuth();
+  
+  const handleBooking = () => {
+    if (user) {
+      setIsBookingModalOpen(true);
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.8, delay }}
-      className={`p-10 rounded-3xl border ${tier.highlight ? 'bg-rose-600 text-white border-rose-500 shadow-2xl shadow-rose-600/30 ring-4 ring-rose-500/10' : 'bg-white text-slate-800 border-slate-100 shadow-xl shadow-rose-900/5'} flex flex-col h-full relative overflow-hidden`}
+      className={`p-10 rounded-3xl border ${tier.highlight ? 'bg-emerald-600 text-white border-emerald-500 shadow-2xl shadow-emerald-600/30 ring-4 ring-emerald-500/10' : 'bg-white text-slate-800 border-slate-100 shadow-xl shadow-slate-900/5'} flex flex-col h-full relative overflow-hidden`}
     >
       {tier.highlight && (
         <div className="absolute top-0 right-0 p-4">
@@ -84,11 +96,11 @@ const PricingCard = ({ tier, delay }: { tier: typeof pricingTiers[0], delay: num
         <span className="text-5xl font-black tracking-tighter leading-none">{tier.price}</span>
         <span className="text-sm font-bold opacity-60 ml-1">/mo</span>
       </div>
-      <p className={`text-sm font-medium mb-8 leading-relaxed ${tier.highlight ? 'text-rose-50/80' : 'text-slate-600'}`}>{tier.description}</p>
+      <p className={`text-sm font-medium mb-8 leading-relaxed ${tier.highlight ? 'text-emerald-50/80' : 'text-slate-600'}`}>{tier.description}</p>
       <div className="space-y-4 mb-10 flex-1">
         {tier.features.map((feature, i) => (
           <div key={i} className="flex items-center gap-3">
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${tier.highlight ? 'bg-white/10 text-white' : 'bg-rose-50 text-rose-600'}`}>
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${tier.highlight ? 'bg-white/10 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
               <Sparkles size={10} />
             </div>
             <span className="text-xs font-bold tracking-tight">{feature}</span>
@@ -96,8 +108,12 @@ const PricingCard = ({ tier, delay }: { tier: typeof pricingTiers[0], delay: num
         ))}
       </div>
       <button 
-        onClick={() => setIsBookingModalOpen(true)}
-        className={`w-full py-5 rounded-2xl font-black text-sm transition-all focus-visible:ring-2 focus-visible:ring-offset-2 outline-none ${tier.highlight ? 'bg-white text-rose-600 hover:bg-rose-50 focus-visible:ring-white' : 'bg-rose-600 text-white hover:bg-rose-700 shadow-lg shadow-rose-600/20 focus-visible:ring-rose-600'}`}
+        onClick={handleBooking}
+        className={`w-full py-5 rounded-2xl font-black text-sm transition-all focus-visible:ring-2 focus-visible:ring-offset-2 outline-none ${
+          tier.highlight ? 'bg-white text-emerald-600 hover:bg-emerald-50 focus-visible:ring-white' : 
+          tier.name === 'Titan' ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/20 focus-visible:ring-blue-600' :
+          'bg-rose-600 text-white hover:bg-rose-700 shadow-lg shadow-rose-600/20 focus-visible:ring-rose-600'
+        }`}
       >
         {tier.cta}
       </button>
@@ -107,7 +123,17 @@ const PricingCard = ({ tier, delay }: { tier: typeof pricingTiers[0], delay: num
 
 export default function HomePage() {
   const containerRef = useRef(null);
-  const { setIsBookingModalOpen } = useModal();
+  const { setIsBookingModalOpen, setIsAuthModalOpen } = useModal();
+  const { notify } = useNotification();
+  const { user } = useAuth();
+
+  const handleBookingClick = () => {
+    if (user) {
+      setIsBookingModalOpen(true);
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const heroImages = [
     "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80",
@@ -225,11 +251,13 @@ export default function HomePage() {
 
   const [contactData, setContactData] = useState({ name: '', email: '', message: '' });
   const [isSubmittingContact, setIsSubmittingContact] = useState(false);
-  const { notify } = useModal() as any; // Using notify from context if available, or just alert
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contactData.name || !contactData.email || !contactData.message) return;
+    if (!contactData.name || !contactData.email || !contactData.message) {
+      notify("Please fill all communication channels.", "error");
+      return;
+    }
     
     setIsSubmittingContact(true);
     try {
@@ -238,21 +266,21 @@ export default function HomePage() {
         ...contactData,
         status: 'pending',
         created_at: new Date().toISOString()
-      }).catch(err => handleFirestoreError(err, OperationType.CREATE, 'inquiries'));
+      });
       
       setContactData({ name: '', email: '', message: '' });
-      // We don't have direct access to notify here easily without useNotification, but let's assume it's injected or use alert
-      alert("Message transmitted to headquarters.");
-    } catch (e) {
+      notify("Message transmitted to headquarters. Expect response within 2 cycles.", "success");
+    } catch (e: any) {
       console.error(e);
-      alert("Transmission failed.");
+      handleFirestoreError(e, OperationType.CREATE, 'inquiries');
+      notify("Transmission failed. System interference detected.", "error");
     } finally {
       setIsSubmittingContact(false);
     }
   };
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className="relative">
       {/* Hero Background */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <AnimatePresence mode="wait">
@@ -294,17 +322,15 @@ export default function HomePage() {
               A scientific approach to peak human condition by Mr Man Fitness. Based in Nakuru, designed for those who demand excellence in every fiber of their being.
             </p>
             <div className="flex flex-col sm:flex-row gap-5">
-              <motion.button 
-                whileHover={{ scale: 1.05, boxShadow: "0 25px 50px -12px rgba(225, 29, 72, 0.5)" }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsBookingModalOpen(true)}
-                className="bg-rose-600 text-white px-12 py-6 rounded-2xl font-black flex items-center justify-center gap-4 transition-all shadow-[0_20px_40px_rgba(225,29,72,0.3)] hover:bg-rose-700 focus-visible:ring-4 focus-visible:ring-rose-400 outline-none"
+              <button 
+                onClick={handleBookingClick}
+                className="bg-blue-600 text-white px-8 md:px-12 py-5 md:py-6 rounded-2xl font-black text-xs md:text-sm transition-all shadow-2xl shadow-blue-600/30 hover:bg-blue-700 active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center gap-4"
               >
                 Book Session <ChevronRight size={22} />
-              </motion.button>
+              </button>
               <Link 
                 to="/studio"
-                className="liquid-glass border-slate-200 text-slate-800 px-10 py-5 rounded-2xl font-black transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 flex items-center justify-center hover:bg-white"
+                className="liquid-glass border-slate-200 text-slate-800 px-10 py-5 rounded-2xl font-black transition-all outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 flex items-center justify-center hover:bg-white"
               >
                 View Studio
               </Link>
@@ -351,7 +377,7 @@ export default function HomePage() {
         <section className="mb-40" id="programs">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-[9px] font-black text-blue-600 mb-6 rounded-full border border-blue-100">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-[9px] font-black text-emerald-600 mb-6 rounded-full border border-emerald-100">
                 <Dumbbell size={12} /> Service Matrix
               </div>
               <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-800 leading-[0.9] mb-8">
@@ -361,8 +387,8 @@ export default function HomePage() {
             </div>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <FeatureCard icon={Dumbbell} title="Compound Lifts" description="Master the foundational movements. Specialized coaching on squats, deadlifts, and presses." delay={0.1} color="rose" />
-            <FeatureCard icon={Target} title="Strength Training" description="Strength training plans designed to increase absolute power output." delay={0.2} color="blue" />
+            <FeatureCard icon={Dumbbell} title="Compound Lifts" description="Master the foundational movements. Specialized coaching on squats, deadlifts, and presses." delay={0.1} color="emerald" />
+            <FeatureCard icon={Target} title="Strength Training" description="Strength training plans designed to increase absolute power output." delay={0.2} color="emerald" />
             <FeatureCard icon={Activity} title="Light Cardio" description="Low-intensity steady-state conditioning (LISS) to optimize aerobic base." delay={0.3} color="emerald" />
           </div>
         </section>
@@ -374,7 +400,7 @@ export default function HomePage() {
               <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-4">The Studio.</h2>
               <p className="text-slate-600 font-medium">A sanctuary of focus and high-performance equipment in the heart of Milimani, Nakuru.</p>
             </div>
-            <Link to="/studio" className="text-xs font-black text-blue-600 bg-blue-50 px-8 py-4 rounded-xl border border-blue-100 hover:bg-blue-100 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 uppercase tracking-widest text-center">Enter Studio</Link>
+            <Link to="/studio" className="text-xs font-black text-emerald-600 bg-emerald-50 px-8 py-4 rounded-xl border border-emerald-100 hover:bg-emerald-100 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 uppercase tracking-widest text-center">Enter Studio</Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 h-[600px]">
             <motion.div whileHover={{ scale: 0.98 }} className="col-span-2 row-span-2 rounded-[2rem] overflow-hidden relative group">
@@ -415,7 +441,7 @@ export default function HomePage() {
           </div>
           {loadingTestimonials ? (
             <div className="flex justify-center py-20">
-              <LoadingSpinner size={40} color="#e11d48" />
+              <LoadingSpinner size={40} />
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-8">
@@ -449,12 +475,12 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="space-y-8"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-[10px] font-black text-blue-600 rounded-full border border-blue-100 uppercase tracking-widest">
-                The Architect Mindset
-              </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-[10px] font-black text-blue-600 mb-6 rounded-full border border-blue-100 uppercase tracking-widest">
+               <Zap size={12} fill="currentColor" /> System Core 2.0
+            </div>
               <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 leading-none">
                 Master Your <br/>
-                <span className="text-blue-600">Internal Locus.</span>
+                <span className="text-emerald-600">Internal Locus.</span>
               </h2>
               <p className="text-xl text-slate-600 font-medium leading-relaxed max-w-lg">
                 At Mr Man Fitness, we believe performance is 20% mechanics and 80% agency. True evolution starts when you realize you aren't just reacting to your environment—you are engineering it.
@@ -462,14 +488,14 @@ export default function HomePage() {
               
               <div className="space-y-6">
                 {[
-                  { icon: Brain, title: "Mental Strength", desc: "Shift from 'I have to' to 'I choose to'. Own every rep and every recovery plan.", color: "blue" },
-                  { icon: Zap, title: "Decisive Action", desc: "Shorten the gap between intent and execution. Eliminate 'drift' from your daily routine.", color: "rose" },
+                  { icon: Brain, title: "Mental Strength", desc: "Shift from 'I have to' to 'I choose to'. Own every rep and every recovery plan.", color: "emerald" },
+                  { icon: Zap, title: "Decisive Action", desc: "Shorten the gap between intent and execution. Eliminate 'drift' from your daily routine.", color: "emerald" },
                   { icon: ShieldCheck, title: "Absolute Ownership", desc: "No excuses. No external blame. Your results are a direct output of your internal state.", color: "emerald" }
                 ].map((pillar, i) => (
                   <div key={i} className="flex gap-5 group">
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg transition-transform group-hover:scale-110 ${
-                      pillar.color === 'blue' ? 'bg-blue-600 text-white shadow-blue-600/20' : 
-                      pillar.color === 'rose' ? 'bg-rose-600 text-white shadow-rose-600/20' : 
+                      pillar.color === 'emerald' ? 'bg-emerald-600 text-white shadow-emerald-600/20' : 
+                      pillar.color === 'emerald' ? 'bg-emerald-600 text-white shadow-emerald-600/20' : 
                       'bg-emerald-600 text-white shadow-emerald-600/20'
                     }`}>
                       <pillar.icon size={20} />
@@ -496,11 +522,11 @@ export default function HomePage() {
                   className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
-                <div className="absolute bottom-12 left-12 right-12 p-8 liquid-glass-blue border-white/20 rounded-[2.5rem]">
+                <div className="absolute bottom-12 left-12 right-12 p-8 liquid-glass-emerald border-white/20 rounded-[2.5rem]">
                   <p className="text-white text-2xl font-black italic tracking-tight mb-4">
                     "Control the variable that matters most: Yourself."
                   </p>
-                  <p className="text-blue-400 font-bold text-xs uppercase tracking-widest">— Transformation Plan</p>
+                  <p className="text-emerald-400 font-bold text-xs uppercase tracking-widest">— Transformation Plan</p>
                 </div>
               </div>
               
@@ -508,10 +534,10 @@ export default function HomePage() {
               <motion.div 
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-6 -right-6 p-6 bg-white rounded-3xl shadow-2xl shadow-blue-900/10 border border-slate-100"
+                className="absolute -top-6 -right-6 p-6 bg-white rounded-3xl shadow-2xl shadow-emerald-900/10 border border-slate-100"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-rose-500 flex items-center justify-center text-white">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white">
                     <TrendingUp size={20} />
                   </div>
                   <div>
@@ -527,13 +553,13 @@ export default function HomePage() {
         {/* Contact Section */}
         <section className="mb-40" id="contact">
           <div className="liquid-glass p-8 md:p-20 rounded-[3rem] overflow-hidden relative border-slate-100/50">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-rose-600/5 blur-[100px] rounded-full -mr-48 -mt-48" />
+            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/5 blur-[100px] rounded-full -mr-48 -mt-48" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-600/5 blur-[100px] rounded-full -ml-48 -mb-48" />
             
             <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-rose-50 text-[9px] font-black text-rose-600 mb-6 rounded-full border border-rose-100">
-                  ESTABLISH CONNECTION
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-[9px] font-black text-emerald-600 mb-6 rounded-full border border-emerald-100">
+                  GET IN TOUCH
                 </div>
                 <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 mb-6 leading-none">Reach Out.</h2>
                 <p className="text-slate-600 font-medium text-lg leading-relaxed mb-10 max-w-md">
@@ -542,7 +568,7 @@ export default function HomePage() {
                 
                 <div className="space-y-6">
                   <div className="flex items-center gap-4 group cursor-pointer">
-                    <div className="w-14 h-14 rounded-2xl bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center text-rose-600 group-hover:bg-rose-600 group-hover:text-white transition-all">
+                    <div className="w-14 h-14 rounded-2xl bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all">
                       <Mail size={24} />
                     </div>
                     <div>
@@ -551,11 +577,11 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4 group cursor-pointer">
-                    <div className="w-14 h-14 rounded-2xl bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <div className="w-14 h-14 rounded-2xl bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all">
                       <Phone size={24} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Secure Line</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone Number</p>
                       <p className="text-xl font-bold text-slate-800">+254 700 000 000</p>
                     </div>
                   </div>
@@ -564,55 +590,59 @@ export default function HomePage() {
                       <MapPin size={24} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Base coordinates</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Location</p>
                       <p className="text-xl font-bold text-slate-800">Milimani, Nakuru City</p>
                     </div>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-rose-900/5 border border-slate-50">
+              <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-emerald-900/5 border border-slate-50">
                 <form onSubmit={handleContactSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Identity</label>
+                      <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Your Name</label>
                       <input 
                         required
                         type="text" 
                         value={contactData.name}
                         onChange={e => setContactData({...contactData, name: e.target.value})}
                         placeholder="Your Name" 
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800" 
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-800" 
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Comm Link</label>
+                      <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Email Address</label>
                       <input 
                         required
                         type="email" 
                         value={contactData.email}
                         onChange={e => setContactData({...contactData, email: e.target.value})}
                         placeholder="Email Address" 
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800" 
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-800" 
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Intel Query</label>
+                    <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest">Your Message</label>
                     <textarea 
                       required
                       rows={4} 
                       value={contactData.message}
                       onChange={e => setContactData({...contactData, message: e.target.value})}
                       placeholder="Tell us your goals..." 
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-bold text-slate-800 resize-none"
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-800 resize-none"
                     ></textarea>
                   </div>
                   <button 
                     disabled={isSubmittingContact}
-                    className="w-full bg-slate-900 text-white font-black py-6 rounded-2xl hover:bg-rose-600 transition-all shadow-xl shadow-slate-900/10 active:scale-95 uppercase tracking-widest text-xs disabled:opacity-50"
+                    className="w-full bg-slate-900 text-white font-black py-6 rounded-2xl hover:bg-emerald-600 transition-all shadow-xl shadow-slate-900/10 active:scale-95 uppercase tracking-widest text-xs disabled:opacity-50"
                   >
-                    {isSubmittingContact ? "Transmitting..." : "Transmit Message"}
+                    {isSubmittingContact ? (
+                      <div className="flex items-center gap-2 justify-center">
+                        <LoadingSpinner size={16} /> Transmitting Protocol...
+                      </div>
+                    ) : "Transmit Message"}
                   </button>
                 </form>
               </div>

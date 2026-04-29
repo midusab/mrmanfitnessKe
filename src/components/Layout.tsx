@@ -23,8 +23,12 @@ import {
   Dumbbell,
   Calendar,
   Activity,
-  Timer
+  Timer,
+  ShieldCheck,
+  LogOut
 } from 'lucide-react';
+import { LoadingSpinner } from './SharedUI';
+import { useEffect } from 'react';
 
 /* --- Shared Modals --- */
 
@@ -81,7 +85,7 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }
               className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 text-slate-700 font-bold py-4 rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98] shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:opacity-50"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-slate-300 border-t-blue-600 rounded-full animate-spin" />
+                <LoadingSpinner size={20} />
               ) : (
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -127,6 +131,9 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
     date: ''
   });
   
+  const [hasExistingBooking, setHasExistingBooking] = useState(false);
+  const [isCheckingBooking, setIsCheckingBooking] = useState(false);
+
   const nakuruLocations = ["Milimani", "Naka", "Shabaab", "Lanet", "Kiamunyi", "Freehold", "London", "Bondeni", "Mwariki", "Pipeline", "Section 58"];
   const programTypes = [
     { name: "Compound Lifts", icon: Dumbbell },
@@ -138,6 +145,29 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
   ];
   const durations = ["4 Weeks (Initiation)", "8 Weeks (Standard)", "12 Weeks (Transformation)", "Ongoing (Elite)"];
 
+  useEffect(() => {
+    const checkBooking = async () => {
+      if (user && isOpen) {
+        setIsCheckingBooking(true);
+        try {
+          const { query, where, getDocs } = await import('firebase/firestore');
+          const q = query(
+            collection(db, 'bookings'), 
+            where('user_id', '==', user.uid),
+            where('status', 'in', ['pending', 'confirmed'])
+          );
+          const querySnapshot = await getDocs(q);
+          setHasExistingBooking(!querySnapshot.empty);
+        } catch (error) {
+          console.error("Error checking bookings", error);
+        } finally {
+          setIsCheckingBooking(false);
+        }
+      }
+    };
+    checkBooking();
+  }, [user, isOpen]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!user) {
@@ -148,6 +178,8 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
     try {
       setStep(2);
       const bookingsRef = collection(db, 'bookings');
+      if (!formData.date) throw new Error("Invalid date");
+      
       await addDoc(bookingsRef, {
         user_id: user.uid,
         user_name: formData.name || profile?.display_name || user.displayName || user.email?.split('@')[0],
@@ -159,7 +191,10 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
         activation_date: new Date(formData.date).toISOString(),
         status: 'pending',
         created_at: new Date().toISOString()
-      }).catch(err => handleFirestoreError(err, OperationType.CREATE, 'bookings'));
+      }).catch(err => {
+        handleFirestoreError(err, OperationType.CREATE, 'bookings');
+        throw err;
+      });
 
       notify("Plan started! We'll confirm your session soon.", "protocol");
 
@@ -176,8 +211,8 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
 
   const InputField = ({ label, icon: Icon, children }: { label: string, icon: any, children: React.ReactNode }) => (
     <div className="space-y-2 group">
-      <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest flex items-center gap-2 group-focus-within:text-rose-600 transition-colors">
-        <Icon size={12} className="text-slate-400 group-focus-within:text-rose-500" /> {label}
+      <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest flex items-center gap-2 group-focus-within:text-blue-600 transition-colors">
+        <Icon size={12} className="text-slate-400 group-focus-within:text-blue-500" /> {label}
       </label>
       <div className="relative">
         {children}
@@ -200,7 +235,7 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="bg-white/80 backdrop-blur-2xl rounded-[3rem] w-full max-w-2xl relative shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] overflow-hidden border border-white/60"
+            className="bg-white/90 backdrop-blur-3xl rounded-[3rem] w-full max-w-xl relative shadow-[0_32px_80px_-16px_rgba(0,0,0,0.2)] overflow-hidden border border-white/60"
           >
             {/* Header Aesthetics */}
             <div className="absolute top-0 inset-x-0 h-1.5 bg-rose-600/10">
@@ -211,38 +246,63 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
               />
             </div>
             
-            <button onClick={onClose} className="absolute top-8 right-8 text-slate-400 hover:text-rose-600 transition-all z-10 p-2.5 rounded-full hover:bg-rose-50 active:scale-90">
+            <button onClick={onClose} className="absolute top-8 right-8 text-slate-400 hover:text-emerald-600 transition-all z-10 p-2.5 rounded-full hover:bg-emerald-50 active:scale-90">
               <X size={20} />
             </button>
 
-            <div className="p-8 md:p-16 max-h-[90vh] overflow-y-auto custom-scrollbar">
-              {step === 1 ? (
+            <div className="p-8 md:p-12 max-h-[90vh] overflow-y-auto custom-scrollbar">
+              {isCheckingBooking ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <LoadingSpinner size={48} />
+                  <p className="mt-4 text-slate-400 font-bold animate-pulse">Verifying Access...</p>
+                </div>
+              ) : hasExistingBooking ? (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-10"
+                >
+                  <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8">
+                    <ShieldCheck size={40} />
+                  </div>
+                  <h3 className="text-3xl font-black tracking-tighter text-slate-900 mb-4">Active Plan Detected.</h3>
+                  <p className="text-slate-500 font-medium mb-10 max-w-xs mx-auto">
+                    You already have an active or pending training plan. Please complete your current program before booking another.
+                  </p>
+                  <Link 
+                    to="/dashboard" 
+                    onClick={onClose}
+                    className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all"
+                  >
+                    View Your Dashboard <ChevronRight size={14} />
+                  </Link>
+                </motion.div>
+              ) : step === 1 ? (
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-rose-50 text-[9px] font-black text-rose-600 mb-4 rounded-full border border-rose-100 shadow-sm">
-                      <Sparkles size={10} /> STARTING PLAN
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-[9px] font-black text-blue-600 mb-4 rounded-full border border-blue-100 shadow-sm uppercase tracking-widest">
+                      <Sparkles size={10} /> PROTOCOL INITIATION
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-4 leading-none">
-                      Secure Your <br/>
-                      <span className="text-rose-600">Evolution.</span>
+                    <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-slate-900 mb-4 leading-none w-full">
+                      Start Your <br/>Training.
                     </h2>
-                    <p className="text-slate-500 font-medium text-sm leading-relaxed max-w-sm">
-                      Enter your details to start your custom fitness plan.
+                    <p className="text-slate-500 font-medium text-sm leading-relaxed">
+                      Fill in the details below to schedule your personalized fitness program.
                     </p>
                   </motion.div>
                   
                   <div className="grid md:grid-cols-2 gap-8">
-                    <InputField label="Full name" icon={User}>
+                    <InputField label="Your Name" icon={User}>
                       <input 
                         required
                         type="text" 
                         value={formData.name}
                         onChange={e => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 placeholder:text-slate-300"
-                        placeholder="Your Name"
+                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-800 placeholder:text-slate-300"
+                        placeholder="John Doe"
                       />
                     </InputField>
                     <InputField label="Email Address" icon={Mail}>
@@ -251,31 +311,31 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
                         type="email" 
                         value={formData.email}
                         onChange={e => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 placeholder:text-slate-300"
-                        placeholder="active@mrman.fit"
+                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-800 placeholder:text-slate-300"
+                        placeholder="example@mail.com"
                       />
                     </InputField>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-8">
-                    <InputField label="Contact Line" icon={Phone}>
+                    <InputField label="Phone Number" icon={Phone}>
                       <input 
                         required
                         type="tel" 
                         value={formData.phone}
                         onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800"
-                        placeholder="+254..."
+                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-800"
+                        placeholder="07..."
                       />
                     </InputField>
-                    <InputField label="Deployment Region" icon={MapPin}>
+                    <InputField label="Training Location" icon={MapPin}>
                       <select 
                         required 
                         value={formData.location}
                         onChange={e => setFormData({ ...formData, location: e.target.value })}
-                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 appearance-none"
+                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-800 appearance-none"
                       >
-                        <option value="">Select Base</option>
+                        <option value="">Select Location</option>
                         {nakuruLocations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
                       </select>
                       <ChevronRight size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 rotate-90 pointer-events-none" />
@@ -283,24 +343,24 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-8">
-                    <InputField label="Training Plan" icon={Dumbbell}>
+                    <InputField label="Training Program" icon={Dumbbell}>
                       <select 
                         required 
                         value={formData.plan}
                         onChange={e => setFormData({ ...formData, plan: e.target.value })}
-                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 appearance-none"
+                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-800 appearance-none"
                       >
-                        <option value="">Select Plan</option>
+                        <option value="">Select Program</option>
                         {programTypes.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
                       </select>
                       <ChevronRight size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 rotate-90 pointer-events-none" />
                     </InputField>
-                    <InputField label="Duration" icon={Timer}>
+                    <InputField label="Session Duration" icon={Timer}>
                       <select 
                         required 
                         value={formData.duration}
                         onChange={e => setFormData({ ...formData, duration: e.target.value })}
-                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 appearance-none"
+                        className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-800 appearance-none"
                       >
                         <option value="">Select Duration</option>
                         {durations.map(d => <option key={d} value={d}>{d}</option>)}
@@ -309,23 +369,23 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
                     </InputField>
                   </div>
 
-                  <InputField label="Activation Date" icon={Calendar}>
+                  <InputField label="Preferred Start Date" icon={Calendar}>
                     <input 
                       required
                       type="date" 
                       value={formData.date}
                       onChange={e => setFormData({ ...formData, date: e.target.value })}
-                      className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800"
+                      className="w-full bg-white/40 border border-slate-200/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-800"
                     />
                   </InputField>
 
-                  <div className="pt-8">
-                    <button type="submit" className="group w-full bg-rose-600 text-white font-black py-7 rounded-[2rem] shadow-[0_20px_40px_-8px_rgba(225,29,72,0.3)] hover:shadow-[0_25px_50px_-12px_rgba(225,29,72,0.4)] hover:bg-rose-700 transition-all active:scale-[0.98] flex items-center justify-center gap-4 text-xl">
-                      Initiate Transformation 
-                      <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                  <div className="pt-4">
+                    <button type="submit" className="group w-full bg-rose-600 text-white font-black py-4 rounded-2xl shadow-[0_15px_30px_-8px_rgba(225,29,72,0.25)] hover:shadow-[0_20px_40px_-12px_rgba(225,29,72,0.35)] hover:bg-rose-700 active:scale-[0.98] flex items-center justify-center gap-3 text-sm uppercase tracking-widest transition-all">
+                      Confirm Evolution
+                      <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                     <p className="text-center text-[9px] font-black text-slate-400 uppercase mt-6 tracking-[0.3em]">
-                      Bio-Verification mandatory on entry
+                      We will contact you shortly to confirm.
                     </p>
                   </div>
                 </form>
@@ -362,7 +422,7 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
 export const Layout = ({ children }: React.PropsWithChildren) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isBookingModalOpen, setIsBookingModalOpen, isAuthModalOpen, setIsAuthModalOpen } = useModal();
-  const { user, profile } = useAuth();
+  const { user, profile, logOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -374,6 +434,16 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
     { name: 'Contact', path: '/#contact', icon: MapPin },
     ...(profile?.role === 'admin' ? [{ name: 'Admin', path: '/admin', icon: ShieldCheck }] : []),
   ];
+
+  const handleBookingClick = () => {
+    if (user) {
+      setIsBookingModalOpen(true);
+    } else {
+      setIsAuthModalOpen(true);
+      // We'll use a standard alert if notify isn't easily accessible, 
+      // but let's assume the Auth Modal will handle the "why" or just let the user sign in.
+    }
+  };
 
   return (
     <div className="relative min-h-screen selection:bg-blue-100 selection:text-blue-600">
@@ -395,8 +465,8 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
               <Link 
                 key={item.name} 
                 to={item.path} 
-                className={`flex items-center gap-2 text-sm font-bold tracking-tight transition-all outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-8 rounded-lg px-2 py-1 ${
-                  location.pathname === item.path ? 'text-rose-600 bg-rose-50/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                className={`flex items-center gap-2 text-sm font-bold tracking-tight transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-8 rounded-lg px-2 py-1 ${
+                  location.pathname === item.path ? 'text-blue-600 bg-blue-50/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
                 {item.name}
@@ -406,31 +476,40 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
 
           <div className="flex items-center gap-6">
             {user ? (
-               <button 
-               onClick={() => navigate('/dashboard')}
-               className="hidden md:flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-full px-4 py-1.5 hover:bg-white transition-all shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-rose-600"
-             >
-               <div className="w-8 h-8 rounded-full overflow-hidden border border-white shadow-sm shrink-0">
-                 <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`} alt="User" className="w-full h-full object-cover" />
+               <div className="flex items-center gap-2">
+                 <button 
+                  onClick={() => navigate(profile?.role === 'admin' ? '/admin' : '/dashboard')}
+                  className="hidden md:flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-full px-4 py-1.5 hover:bg-white transition-all shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden border border-white shadow-sm shrink-0">
+                    <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=0D9488&color=fff`} alt="User" className="w-full h-full object-cover" />
+                  </div>
+                  <span className="text-sm font-bold text-slate-800 hidden lg:block">{profile?.display_name || user.displayName || user.email?.split('@')[0]}</span>
+                </button>
+                <button 
+                  onClick={logOut}
+                  title="Protocol Exit"
+                  className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                >
+                  <LogOut size={18} />
+                </button>
                </div>
-               <span className="text-sm font-bold text-slate-800 hidden lg:block">{profile?.display_name || user.displayName || user.email?.split('@')[0]}</span>
-             </button>
             ) : (
               <button 
                 onClick={() => setIsAuthModalOpen(true)}
-                className="hidden md:flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-rose-600 transition-all outline-none focus-visible:ring-2 focus-visible:ring-rose-600 rounded-lg px-2"
+                className="hidden md:flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg px-2"
               >
                 <User size={18} />
                 <span>Sign In</span>
               </button>
             )}
             <button 
-              onClick={() => setIsBookingModalOpen(true)}
+              onClick={handleBookingClick}
               className="hidden md:block text-sm font-black bg-rose-600 text-white px-8 py-3 rounded-full hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2 uppercase tracking-wider"
             >
               Book Session
             </button>
-            <button className="md:hidden text-slate-800" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button className="md:hidden text-slate-800 hover:text-emerald-600 transition-colors" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
@@ -452,14 +531,14 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
                   key={item.name} 
                   to={item.path} 
                   onClick={() => setIsMenuOpen(false)} 
-                  className="text-4xl font-black tracking-tighter text-slate-800 outline-none focus-visible:text-rose-600 focus-visible:ring-2 focus-visible:ring-rose-600 rounded-xl"
+                  className="text-4xl font-black tracking-tighter text-slate-800 outline-none focus-visible:text-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-xl"
                 >
                   {item.name}
                 </Link>
               ))}
               <hr className="border-slate-100" />
               <button 
-                onClick={() => { setIsMenuOpen(false); setIsBookingModalOpen(true); }}
+                onClick={() => { setIsMenuOpen(false); handleBookingClick(); }}
                 className="bg-rose-600 text-white px-8 py-5 rounded-2xl font-black text-lg shadow-xl shadow-rose-600/20 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 uppercase tracking-widest"
               >
                 Book Session
@@ -473,13 +552,13 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
 
       {/* Footer */}
       <footer className="w-full mt-20 pt-32 pb-20 bg-slate-900 overflow-hidden relative shadow-2xl">
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/10 blur-[150px] rounded-full" />
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-600/10 blur-[150px] rounded-full" />
         
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-20 mb-24 relative z-10">
           <div className="space-y-8">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-xl shadow-blue-600/40">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-600/40">
                 <Zap size={28} fill="white" className="text-white" />
               </div>
               <span className="font-black tracking-tighter text-3xl text-white">Mr Man.</span>
@@ -489,7 +568,7 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
             </p>
             <div className="flex gap-4">
               {[Facebook, Twitter, Share2].map((Icon, i) => (
-                <button key={i} className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-600 transition-all outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+                <button key={i} className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-emerald-600 transition-all outline-none focus-visible:ring-2 focus-visible:ring-emerald-600">
                   <Icon size={18} />
                 </button>
               ))}
@@ -497,10 +576,10 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
           </div>
 
           <div className="space-y-6">
-            <h4 className="text-blue-500 font-black text-[10px] uppercase">Navigation</h4>
+            <h4 className="text-emerald-500 font-black text-[10px] uppercase">Navigation</h4>
             <div className="flex flex-col gap-4 text-sm font-bold text-slate-300">
               {navItems.map(item => (
-                <Link key={item.name} to={item.path} className="hover:text-rose-500 transition-all inline-flex items-center gap-2 group outline-none focus-visible:ring-2 focus-visible:ring-rose-600 rounded-lg px-2 -mx-2">
+                <Link key={item.name} to={item.path} className="hover:text-emerald-500 transition-all inline-flex items-center gap-2 group outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-lg px-2 -mx-2">
                   <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
                   {item.name}
                 </Link>
@@ -512,7 +591,7 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
             <h4 className="text-emerald-500 font-black text-[10px] uppercase tracking-[0.2em]">Contact base</h4>
             <div className="space-y-5">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
                   <MapPin size={18} />
                 </div>
                 <div>
@@ -523,7 +602,7 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
                   <Mail size={18} />
                 </div>
                 <div>
@@ -532,7 +611,7 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
                   <Phone size={18} />
                 </div>
                 <div>
@@ -541,7 +620,7 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
                   <Clock size={18} />
                 </div>
                 <div>
@@ -553,11 +632,11 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
           </div>
 
           <div className="space-y-6">
-            <h4 className="text-rose-500 font-black text-[10px] uppercase">Base Info</h4>
+            <h4 className="text-emerald-500 font-black text-[10px] uppercase">Base Info</h4>
             <p className="text-xs text-slate-500 font-medium leading-relaxed">Join the elite fitness network in Nakuru. Get real-time updates on new plans and studio sessions.</p>
             <button 
               onClick={() => setIsBookingModalOpen(true)}
-              className="w-full bg-rose-600 text-white font-black py-4 rounded-2xl text-[10px] hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20 uppercase tracking-widest"
+              className="w-full bg-emerald-600 text-white font-black py-4 rounded-2xl text-[10px] hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 uppercase tracking-widest"
             >
               Start Your Evolution
             </button>
@@ -567,8 +646,8 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center pt-12 border-t border-white/5 gap-6 text-[10px] font-black text-slate-500 uppercase relative z-10">
           <p>© 2026 Mr Man Fitness • All systems optimized</p>
           <div className="flex gap-8">
-            <Link to="/privacy" className="hover:text-blue-500 transition-colors outline-none focus-visible:text-blue-500 focus-visible:ring-2 focus-visible:ring-blue-600 rounded-sm">Privacy</Link>
-            <Link to="/terms" className="hover:text-blue-500 transition-colors outline-none focus-visible:text-blue-500 focus-visible:ring-2 focus-visible:ring-blue-600 rounded-sm">Terms</Link>
+            <Link to="/privacy" className="hover:text-emerald-500 transition-colors outline-none focus-visible:text-emerald-500 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-sm">Privacy</Link>
+            <Link to="/terms" className="hover:text-emerald-500 transition-colors outline-none focus-visible:text-emerald-500 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-sm">Terms</Link>
           </div>
         </div>
       </footer>
@@ -585,7 +664,7 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
           animate={{ scale: 1, opacity: 1 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="w-14 h-14 bg-rose-600 text-white rounded-full flex items-center justify-center shadow-2xl shadow-rose-600/40 hover:bg-rose-700 transition-colors"
+          className="w-14 h-14 bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-2xl shadow-emerald-600/40 hover:bg-emerald-700 transition-colors cursor-pointer"
         >
           <Phone size={24} fill="white" />
         </motion.a>
@@ -599,7 +678,7 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
           animate={{ scale: 1, opacity: 1 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="w-14 h-14 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-2xl shadow-emerald-500/40 hover:bg-emerald-600 transition-colors"
+          className="w-14 h-14 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-2xl shadow-emerald-500/40 hover:bg-emerald-600 transition-colors cursor-pointer"
         >
           <svg 
             viewBox="0 0 24 24" 
