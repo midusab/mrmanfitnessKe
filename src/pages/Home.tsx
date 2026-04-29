@@ -542,6 +542,20 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Pricing Tiers Section */}
+        <div className="mb-40" id="pricing">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-6">
+              Invest in Your Health
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {pricingTiers.map((tier, i) => (
+              <PricingCard key={i} tier={tier} delay={i * 0.1} />
+            ))}
+          </div>
+        </div>
+
         {/* Contact Section */}
         <section className="mb-40" id="contact">
           <div className="liquid-glass p-8 md:p-20 rounded-[3rem] overflow-hidden relative border-slate-100/50">

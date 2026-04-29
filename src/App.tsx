@@ -1,17 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Layout } from './components/Layout';
-import HomePage from './pages/Home';
-import ProgramsPage from './pages/Programs';
-import StudioPage from './pages/Studio';
 import { LoadingSpinner } from './components/SharedUI';
 import { motion, AnimatePresence } from 'motion/react';
 import { ModalProvider } from './context/ModalContext';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
-import DashboardPage from './pages/Dashboard';
-import PortfolioPage from './pages/Portfolio';
-import AdminPage from './pages/Admin';
+
+// Lazy load pages for performance
+const HomePage = lazy(() => import('./pages/Home'));
+const ProgramsPage = lazy(() => import('./pages/Programs'));
+const StudioPage = lazy(() => import('./pages/Studio'));
+const DashboardPage = lazy(() => import('./pages/Dashboard'));
+const PortfolioPage = lazy(() => import('./pages/Portfolio'));
+const AdminPage = lazy(() => import('./pages/Admin'));
+
+const PageLoader = () => (
+  <div className="min-h-[60vh] flex items-center justify-center">
+    <LoadingSpinner size={32} />
+  </div>
+);
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -79,14 +87,16 @@ export default function App() {
             </motion.div>
           ) : (
             <Layout key="main-content">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/programs" element={<ProgramsPage />} />
-                <Route path="/studio" element={<StudioPage />} />
-                <Route path="/portfolio" element={<PortfolioPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-              </Routes>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/programs" element={<ProgramsPage />} />
+                  <Route path="/studio" element={<StudioPage />} />
+                  <Route path="/portfolio" element={<PortfolioPage />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                </Routes>
+              </Suspense>
             </Layout>
           )}
         </AnimatePresence>
