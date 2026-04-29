@@ -271,14 +271,19 @@ export default function HomePage() {
           created_at: new Date().toISOString()
         }]);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase submission error:", error);
+        throw new Error(error.message || "Failed to transmit to Supabase.");
+      }
       
       setContactData({ name: '', email: '', message: '' });
       notify("Your message has been sent successfully!", "success");
     } catch (e: any) {
-      console.error(e);
-      notify("Could not send message. Please try again.", "error");
-      // log but don't re-throw to keep UI alive
+      console.error("Contact submission error:", e);
+      const errorMsg = e.message?.includes('PGRST116') || e.message?.includes('relation "public.inquiries" does not exist')
+        ? "Database table 'inquiries' not found. Please check Supabase setup."
+        : e.message || "Could not send message. Please try again.";
+      notify(errorMsg, "error");
     } finally {
       setIsSubmittingContact(false);
     }

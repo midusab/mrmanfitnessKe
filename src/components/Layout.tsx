@@ -198,7 +198,10 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
           created_at: new Date().toISOString()
         }]);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase booking error:", error);
+        throw new Error(error.message || "Failed to transmit booking protocol.");
+      }
 
       notify("Booking successful! We'll confirm your session soon.", "success");
 
@@ -206,9 +209,12 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
         onClose();
         setStep(1);
       }, 4000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Booking error:', error);
-      notify("Something went wrong with your booking. Please try again.", "error");
+      const errorMsg = error.message?.includes('PGRST116') || error.message?.includes('relation "public.bookings" does not exist')
+        ? "Database table 'bookings' not found. Please check Supabase setup."
+        : error.message || "Something went wrong with your booking. Please try again.";
+      notify(errorMsg, "error");
       setStep(1);
     }
   };
