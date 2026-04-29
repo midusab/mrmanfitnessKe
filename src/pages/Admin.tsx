@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import { LoadingSpinner } from '../components/SharedUI';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { 
   Plus, 
   Trash2, 
@@ -133,7 +133,6 @@ const AdminPage = () => {
   };
 
   if (authLoading || (loading && bookings.length === 0)) {
-    const isSupabaseConfigured = !supabase.supabaseUrl.includes('placeholder-url-missing');
     
     return (
       <div className="min-h-screen pt-32 flex flex-col items-center justify-center">

@@ -8,6 +8,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Use placeholders to prevent the app from crashing, but log the issue
+export const isSupabaseConfigured = Boolean(supabaseUrl && !supabaseUrl.includes('placeholder-url-missing'));
+
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder-url-missing.supabase.co',
   supabaseAnonKey || 'placeholder-key-missing'
