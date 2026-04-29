@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useModal } from '../context/ModalContext';
 import { useNotification } from '../context/NotificationContext';
 import { db, OperationType, handleFirestoreError } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 import { collection, query, orderBy, limit, getDocs, addDoc } from 'firebase/firestore';
 import { 
   Zap, 
@@ -261,19 +262,23 @@ export default function HomePage() {
     
     setIsSubmittingContact(true);
     try {
-      const inquiriesRef = collection(db, 'inquiries');
-      await addDoc(inquiriesRef, {
-        ...contactData,
-        status: 'pending',
-        created_at: new Date().toISOString()
-      });
+      const { error } = await supabase
+        .from('inquiries')
+        .insert([{
+          ...contactData,
+          user_id: user?.uid || null,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        }]);
+      
+      if (error) throw error;
       
       setContactData({ name: '', email: '', message: '' });
-      notify("Message transmitted to headquarters. Expect response within 2 cycles.", "success");
+      notify("Your message has been sent successfully!", "success");
     } catch (e: any) {
       console.error(e);
-      handleFirestoreError(e, OperationType.CREATE, 'inquiries');
-      notify("Transmission failed. System interference detected.", "error");
+      notify("Could not send message. Please try again.", "error");
+      // log but don't re-throw to keep UI alive
     } finally {
       setIsSubmittingContact(false);
     }

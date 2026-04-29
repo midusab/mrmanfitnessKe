@@ -30,20 +30,25 @@ import {
 } from 'lucide-react';
 import { LoadingSpinner } from '../components/SharedUI';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { 
+  Plus, 
+  Trash2, 
+  Clock, 
+  AlertTriangle,
+  ListTodo
+} from 'lucide-react';
 
 const AdminPage = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const { notify } = useNotification();
   const navigate = useNavigate();
   
-  const [activeTab, setActiveTab] = useState<'bookings' | 'inquiries' | 'promotions'>('bookings');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'inquiries'>('bookings');
   const [bookings, setBookings] = useState<any[]>([]);
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Promotion Form State
-  const [promoData, setPromoData] = useState({ title: '', content: '', type: 'General' });
-  const [isSubmittingPromo, setIsSubmittingPromo] = useState(false);
+  const [responseTexts, setResponseTexts] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!authLoading && (!user || profile?.role !== 'admin')) {
@@ -55,17 +60,29 @@ const AdminPage = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch Bookings
-      const bookingsRef = collection(db, 'bookings');
-      const bQuery = query(bookingsRef, orderBy('created_at', 'desc'));
-      const bSnap = await getDocs(bQuery);
-      setBookings(bSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      // Fetch Bookings from Supabase
+      const { data: bData, error: bError } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (bError) {
+        console.error("Supabase bookings error:", bError);
+      } else {
+        setBookings(bData || []);
+      }
 
-      // Fetch Inquiries
-      const inquiriesRef = collection(db, 'inquiries');
-      const iQuery = query(inquiriesRef, orderBy('created_at', 'desc'));
-      const iSnap = await getDocs(iQuery);
-      setInquiries(iSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      // Fetch Inquiries from Supabase
+      const { data: iData, error: iError } = await supabase
+        .from('inquiries')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (iError) {
+        console.error("Supabase inquiries error:", iError);
+      } else {
+        setInquiries(iData || []);
+      }
 
     } catch (e) {
       console.error(e);
@@ -83,46 +100,35 @@ const AdminPage = () => {
 
   const handleBookingAction = async (id: string, status: 'confirmed' | 'cancelled') => {
     try {
-      const bRef = doc(db, 'bookings', id);
-      await updateDoc(bRef, { status, updated_at: new Date().toISOString() });
-      notify(`Booking ${status}.`, "success");
-      fetchData();
-    } catch (e) {
-      notify("Action failed.", "error");
-    }
-  };
-
-  const handleInquiryAction = async (id: string, status: 'responded') => {
-    try {
-      const iRef = doc(db, 'inquiries', id);
-      await updateDoc(iRef, { status, updated_at: new Date().toISOString() });
-      notify("Inquiry status updated.", "success");
-      fetchData();
-    } catch (e) {
-      notify("Action failed.", "error");
-    }
-  };
-
-  const handleCreatePromo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!promoData.title || !promoData.content) return;
-    
-    setIsSubmittingPromo(true);
-    try {
-      const updatesRef = collection(db, 'program_updates');
-      await addDoc(updatesRef, {
-        ...promoData,
-        created_at: new Date().toISOString(),
-        program_type: promoData.type
-      });
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', id);
       
-      notify("Promotion dispatched successfully.", "success");
-      setPromoData({ title: '', content: '', type: 'General' });
+      if (error) throw error;
+      notify(`Booking marked as ${status}.`, "success");
       fetchData();
     } catch (e) {
-      notify("Dispatch failed.", "error");
-    } finally {
-      setIsSubmittingPromo(false);
+      notify("Action failed.", "error");
+    }
+  };
+
+  const handleInquiryAction = async (id: string, response: string) => {
+    try {
+      const { error } = await supabase
+        .from('inquiries')
+        .update({ 
+          status: 'responded', 
+          admin_response: response,
+          responded_at: new Date().toISOString() 
+        })
+        .eq('id', id);
+      
+      if (error) throw error;
+      notify("Your response has been sent to the user.", "success");
+      fetchData();
+    } catch (e) {
+      notify("Response failed to transmit.", "error");
     }
   };
 
@@ -182,8 +188,7 @@ const AdminPage = () => {
           <div className="lg:col-span-1 space-y-2">
             {[
               { id: 'bookings', label: 'Bookings', icon: Calendar },
-              { id: 'inquiries', label: 'Inquiries', icon: Mail },
-              { id: 'promotions', label: 'Promotions', icon: Zap }
+              { id: 'inquiries', label: 'Inquiries', icon: Mail }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -211,7 +216,16 @@ const AdminPage = () => {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-8">Manage Bookings.</h3>
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-2xl font-black tracking-tighter text-slate-900">Manage Bookings.</h3>
+                    <button 
+                      onClick={fetchData}
+                      className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+                    >
+                      <Activity size={14} className={loading ? 'animate-spin' : ''} />
+                      Refresh Protocols
+                    </button>
+                  </div>
                   {bookings.length > 0 ? bookings.map(booking => (
                     <div key={booking.id} className="p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-emerald-100 transition-colors">
                       <div className="space-y-1">
@@ -278,7 +292,16 @@ const AdminPage = () => {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-8">Inquiry Inbox.</h3>
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-2xl font-black tracking-tighter text-slate-900">Inquiry Inbox.</h3>
+                    <button 
+                      onClick={fetchData}
+                      className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+                    >
+                      <Activity size={14} className={loading ? 'animate-spin' : ''} />
+                      Sync Protocol
+                    </button>
+                  </div>
                   {inquiries.length > 0 ? inquiries.map(inquiry => (
                     <div key={inquiry.id} className="p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:border-blue-100 transition-colors">
                       <div className="flex justify-between items-start mb-6">
@@ -295,16 +318,32 @@ const AdminPage = () => {
                       <p className="bg-slate-50 p-6 rounded-2xl text-slate-600 font-medium leading-relaxed mb-6 italic">
                         "{inquiry.message}"
                       </p>
+                      {inquiry.status === 'responded' ? (
+                        <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100 mb-6">
+                          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">Admin Response</p>
+                          <p className="text-slate-700 font-medium italic">"{inquiry.admin_response}"</p>
+                        </div>
+                      ) : (
+                        <div className="mb-6 space-y-3">
+                          <textarea 
+                            value={responseTexts[inquiry.id] || ''}
+                            onChange={e => setResponseTexts({...responseTexts, [inquiry.id]: e.target.value})}
+                            placeholder="Type intelligence report for athlete..."
+                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all font-bold text-slate-800 resize-none h-24"
+                          />
+                        </div>
+                      )}
+
                       <div className="flex justify-between items-center">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                           Received: {new Date(inquiry.created_at).toLocaleString()}
                         </p>
                         {inquiry.status !== 'responded' && (
                           <button 
-                            onClick={() => handleInquiryAction(inquiry.id, 'responded')}
+                            onClick={() => handleInquiryAction(inquiry.id, responseTexts[inquiry.id] || 'Understood. We are reviewing your request.')}
                             className="bg-rose-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-700 transition-all shadow-xl shadow-rose-600/20 flex items-center gap-2"
                           >
-                            Mark as Responded <ArrowRight size={14} />
+                            Dispatch Response <ArrowRight size={14} />
                           </button>
                         )}
                       </div>
@@ -314,74 +353,6 @@ const AdminPage = () => {
                       <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No active inquiries in queue.</p>
                     </div>
                   )}
-                </motion.div>
-              )}
-
-              {activeTab === 'promotions' && (
-                <motion.div 
-                  key="promotions"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                >
-                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-8">Promotion Studio.</h3>
-                  <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm">
-                    <form onSubmit={handleCreatePromo} className="space-y-8">
-                      <div className="grid md:grid-cols-2 gap-8">
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">Promotion Title</label>
-                          <input 
-                            required
-                            type="text" 
-                            value={promoData.title}
-                            onChange={e => setPromoData({...promoData, title: e.target.value})}
-                            placeholder="e.g. New Year Muscle Rebuild"
-                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold text-slate-800"
-                          />
-                        </div>
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">Target Program Type</label>
-                          <select 
-                            value={promoData.type}
-                            onChange={e => setPromoData({...promoData, type: e.target.value})}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold text-slate-800 appearance-none"
-                          >
-                            <option value="General">General (Global)</option>
-                            <option value="Elite">Elite Only</option>
-                            <option value="Vanguard">Vanguard Tier</option>
-                            <option value="Titan">Titan Tier</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">Broadcast Message</label>
-                        <textarea 
-                          required
-                          rows={4}
-                          value={promoData.content}
-                          onChange={e => setPromoData({...promoData, content: e.target.value})}
-                          placeholder="What would you like to announce to your athletes?"
-                          className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold text-slate-800 resize-none"
-                        ></textarea>
-                      </div>
-
-                      <button 
-                        disabled={isSubmittingPromo}
-                        className="w-full bg-blue-600 text-white font-black py-6 rounded-[2rem] shadow-2xl shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3 text-lg uppercase tracking-widest disabled:opacity-50"
-                      >
-                        {isSubmittingPromo ? (
-                          <>
-                            <LoadingSpinner size={20} /> Dispatching Intelligence...
-                          </>
-                        ) : (
-                          <>
-                            <Zap size={20} fill="white" /> Dispatch Intelligence
-                          </>
-                        )}
-                      </button>
-                    </form>
-                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

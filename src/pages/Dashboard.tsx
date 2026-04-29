@@ -11,7 +11,8 @@ import {
   ShieldCheck,
   Activity,
   Bell,
-  Star
+  Star,
+  Fingerprint
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
@@ -19,6 +20,7 @@ import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { collection, query, where, getDocs, orderBy, limit, doc, updateDoc, addDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { LoadingSpinner } from '../components/SharedUI';
+import { supabase } from '../lib/supabase';
 
 const DashboardPage = () => {
   const { user, profile, logOut, loading: authLoading } = useAuth();
@@ -27,6 +29,7 @@ const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'profile' | 'bookings' | 'updates'>('overview');
   const [bookings, setBookings] = useState<any[]>([]);
   const [updates, setUpdates] = useState<any[]>([]);
+  const [inquiries, setInquiries] = useState<any[]>([]);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [profileData, setProfileData] = useState({ display_name: '', bio: '' });
   const [loading, setLoading] = useState(true);
@@ -52,17 +55,37 @@ const DashboardPage = () => {
     if (!user) return;
     try {
       setLoading(true);
-      // Fetch bookings
-      const bookingsRef = collection(db, 'bookings');
-      const qBookings = query(bookingsRef, where('user_id', '==', user.uid), orderBy('created_at', 'desc'));
-      const bookingsSnap = await getDocs(qBookings);
-      setBookings(bookingsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      // Fetch bookings from Supabase
+      const { data: bData, error: bError } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('user_id', user.uid)
+        .order('created_at', { ascending: false });
+      
+      if (bError) {
+        console.error("Supabase bookings error:", bError);
+      } else {
+        setBookings(bData || []);
+      }
 
       // Fetch program updates
       const updatesRef = collection(db, 'program_updates');
       const qUpdates = query(updatesRef, orderBy('created_at', 'desc'), limit(5));
       const updatesSnap = await getDocs(qUpdates);
       setUpdates(updatesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+      // Fetch Inquiries from Supabase
+      const { data: iData, error: iError } = await supabase
+        .from('inquiries')
+        .select('*')
+        .eq('user_id', user.uid)
+        .order('created_at', { ascending: false });
+      
+      if (iError) {
+        console.error("Supabase fetch error:", iError);
+      } else {
+        setInquiries(iData || []);
+      }
 
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -298,6 +321,35 @@ const DashboardPage = () => {
                       )}
                     </div>
                   </div>
+
+                  {/* Inquiry Responses */}
+                  {inquiries.some(i => i.status === 'responded') && (
+                    <div className="bg-white border-2 border-emerald-100 p-10 rounded-[3rem] shadow-xl shadow-emerald-900/5">
+                      <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-8 flex items-center gap-3">
+                        <MessageSquare className="text-emerald-600" size={24} /> Inquiry Intelligence
+                      </h3>
+                      <div className="space-y-6">
+                        {inquiries.filter(i => i.status === 'responded').map(inquiry => (
+                          <div key={inquiry.id} className="bg-slate-50 p-8 rounded-3xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-2 h-full bg-emerald-500" />
+                            <div className="mb-4">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Your Inquiry</p>
+                              <p className="text-slate-600 font-medium italic">"{inquiry.message}"</p>
+                            </div>
+                            <div className="bg-white p-6 rounded-2xl border border-emerald-50 shadow-sm">
+                              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <ShieldCheck size={12} /> Official Response
+                              </p>
+                              <p className="text-slate-800 font-bold leading-relaxed">{inquiry.admin_response}</p>
+                              <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-4">
+                                Responded at: {new Date(inquiry.responded_at).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               )}
 

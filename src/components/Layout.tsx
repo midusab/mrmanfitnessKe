@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { LoadingSpinner } from './SharedUI';
 import { useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 /* --- Shared Modals --- */
 
@@ -150,14 +151,14 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
       if (user && isOpen) {
         setIsCheckingBooking(true);
         try {
-          const { query, where, getDocs } = await import('firebase/firestore');
-          const q = query(
-            collection(db, 'bookings'), 
-            where('user_id', '==', user.uid),
-            where('status', 'in', ['pending', 'confirmed'])
-          );
-          const querySnapshot = await getDocs(q);
-          setHasExistingBooking(!querySnapshot.empty);
+          const { data, error } = await supabase
+            .from('bookings')
+            .select('id')
+            .eq('user_id', user.uid)
+            .in('status', ['pending', 'confirmed']);
+          
+          if (error) throw error;
+          setHasExistingBooking(data && data.length > 0);
         } catch (error) {
           console.error("Error checking bookings", error);
         } finally {
@@ -177,24 +178,24 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
 
     try {
       setStep(2);
-      const bookingsRef = collection(db, 'bookings');
       if (!formData.date) throw new Error("Invalid date");
       
-      await addDoc(bookingsRef, {
-        user_id: user.uid,
-        user_name: formData.name || profile?.display_name || user.displayName || user.email?.split('@')[0],
-        email: formData.email || user.email,
-        phone: formData.phone,
-        location: formData.location,
-        plan: formData.plan,
-        duration: formData.duration,
-        activation_date: new Date(formData.date).toISOString(),
-        status: 'pending',
-        created_at: new Date().toISOString()
-      }).catch(err => {
-        handleFirestoreError(err, OperationType.CREATE, 'bookings');
-        throw err;
-      });
+      const { error } = await supabase
+        .from('bookings')
+        .insert([{
+          user_id: user.uid,
+          user_name: formData.name || profile?.display_name || user.displayName || user.email?.split('@')[0],
+          email: formData.email || user.email,
+          phone: formData.phone,
+          location: formData.location,
+          plan: formData.plan,
+          duration: formData.duration,
+          activation_date: new Date(formData.date).toISOString(),
+          status: 'pending',
+          created_at: new Date().toISOString()
+        }]);
+      
+      if (error) throw error;
 
       notify("Plan started! We'll confirm your session soon.", "protocol");
 
