@@ -125,6 +125,7 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
   const { notify } = useNotification();
   const { setIsAuthModalOpen } = useModal();
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -148,6 +149,17 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
     { name: "Weight Gain", icon: Zap }
   ];
   const durations = ["4 Weeks (Initiation)", "8 Weeks (Standard)", "12 Weeks (Transformation)", "Ongoing (Elite)"];
+
+  // Sync profile data when modal opens
+  useEffect(() => {
+    if (user && isOpen) {
+      setFormData(prev => ({
+        ...prev,
+        name: profile?.display_name || user.displayName || prev.name,
+        email: user.email || prev.email,
+      }));
+    }
+  }, [user, profile, isOpen]);
 
   useEffect(() => {
     const checkBooking = async () => {
@@ -179,16 +191,19 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
       return;
     }
 
+    if (new Date(formData.date) < new Date(new Date().setHours(0,0,0,0))) {
+      notify("Please select a date in the future.", "error");
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      setStep(2);
-      if (!formData.date) throw new Error("Invalid date");
-      
       const { error } = await supabase
         .from('bookings')
         .insert([{
           user_id: user.uid,
-          user_name: formData.name || profile?.display_name || user.displayName || user.email?.split('@')[0],
-          email: formData.email || user.email,
+          user_name: formData.name,
+          email: formData.email,
           phone: formData.phone,
           location: formData.location,
           plan: formData.plan,
@@ -198,16 +213,15 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
           created_at: new Date().toISOString()
         }]);
       
-      if (error) {
-        console.error("Supabase booking error:", error);
-        throw new Error(error.message || "Failed to transmit booking protocol.");
-      }
+      if (error) throw error;
 
+      setStep(2);
       notify("Booking successful! We'll confirm your session soon.", "success");
 
       setTimeout(() => {
         onClose();
         setStep(1);
+        setFormData({ name: '', email: '', phone: '', location: '', plan: '', duration: '', date: '' });
       }, 4000);
     } catch (error: any) {
       console.error('Booking error:', error);
@@ -215,7 +229,8 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
         ? "Database table 'bookings' not found. Please check Supabase setup."
         : error.message || "Something went wrong with your booking. Please try again.";
       notify(errorMsg, "error");
-      setStep(1);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -390,9 +405,22 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
                   </InputField>
 
                   <div className="pt-4">
-                    <button type="submit" className="group w-full bg-rose-600 text-white font-black py-4 rounded-2xl shadow-[0_15px_30px_-8px_rgba(225,29,72,0.25)] hover:shadow-[0_20px_40px_-12px_rgba(225,29,72,0.35)] hover:bg-rose-700 active:scale-[0.98] flex items-center justify-center gap-3 text-sm uppercase tracking-widest transition-all">
-                      Confirm Evolution
-                      <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    <button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="group w-full bg-rose-600 text-white font-black py-4 rounded-2xl shadow-[0_15px_30px_-8px_rgba(225,29,72,0.25)] hover:shadow-[0_20px_40px_-12px_rgba(225,29,72,0.35)] hover:bg-rose-700 active:scale-[0.98] flex items-center justify-center gap-3 text-sm uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <LoadingSpinner size={18} />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          Confirm Evolution
+                          <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
                     </button>
                     <p className="text-center text-[9px] font-black text-slate-400 uppercase mt-6 tracking-[0.3em]">
                       We will contact you shortly to confirm.
