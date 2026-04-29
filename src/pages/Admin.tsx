@@ -133,9 +133,31 @@ const AdminPage = () => {
   };
 
   if (authLoading || (loading && bookings.length === 0)) {
+    const isSupabaseConfigured = !supabase.supabaseUrl.includes('placeholder-url-missing');
+    
     return (
-      <div className="min-h-screen pt-32 flex items-center justify-center">
-        <LoadingSpinner size={48} />
+      <div className="min-h-screen pt-32 flex flex-col items-center justify-center">
+        {!isSupabaseConfigured ? (
+          <div className="text-center p-8 bg-rose-50 border-2 border-rose-100 rounded-[2rem] max-w-md">
+            <AlertTriangle className="text-rose-600 mx-auto mb-4" size={48} />
+            <h3 className="text-xl font-black text-slate-900 mb-2">Supabase Disconnected</h3>
+            <p className="text-slate-500 text-sm font-medium mb-6">
+              Your environment variables (VITE_SUPABASE_URL) are missing in Vercel. 
+              The Admin Dashboard cannot function without them.
+            </p>
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="text-xs font-black uppercase tracking-widest bg-slate-900 text-white px-6 py-3 rounded-xl"
+            >
+              Back to Safety
+            </button>
+          </div>
+        ) : (
+          <>
+            <LoadingSpinner size={48} />
+            <p className="mt-4 text-slate-400 font-bold animate-pulse uppercase tracking-[0.2em] text-[10px]">Synchronizing Protocols...</p>
+          </>
+        )}
       </div>
     );
   }

@@ -61,12 +61,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const docSnap = await getDoc(profileRef);
       
       if (!docSnap.exists()) {
+        const isAdmin = ['midusab@gmail.com', 'bochieng228@gmail.com'].includes(firebaseUser.email || '');
         const newProfile = {
           id: firebaseUser.uid,
           display_name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
           email: firebaseUser.email,
           photo_url: firebaseUser.photoURL,
-          role: firebaseUser.email === 'midusab@gmail.com' ? 'admin' : 'user',
+          role: isAdmin ? 'admin' : 'user',
           bio: '',
           updated_at: new Date().toISOString(),
         };
@@ -74,8 +75,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(newProfile);
       } else {
         const existingData = docSnap.data();
+        const isAdmin = ['midusab@gmail.com', 'bochieng228@gmail.com'].includes(firebaseUser.email || '');
         // Ensure admin role if email matches but role is not set
-        if (firebaseUser.email === 'midusab@gmail.com' && existingData.role !== 'admin') {
+        if (isAdmin && existingData.role !== 'admin') {
           await updateDoc(profileRef, { role: 'admin' });
           setProfile({ ...existingData, role: 'admin' });
         } else {
