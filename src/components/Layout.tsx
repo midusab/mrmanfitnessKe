@@ -45,8 +45,11 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }
       await signIn();
       notify("Welcome back! Your profile is ready.", "success");
       onClose();
-    } catch (error) {
-      notify("Sign in failed. Please try again.", "error");
+    } catch (error: any) {
+      if (error.code !== 'auth/popup-closed-by-user') {
+        const errorMessage = error.message || "Sign in failed. Please try again.";
+        notify(errorMessage, "error");
+      }
       console.error("Sign in failed", error);
     } finally {
       setIsLoading(false);
@@ -197,7 +200,7 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
       
       if (error) throw error;
 
-      notify("Plan started! We'll confirm your session soon.", "protocol");
+      notify("Booking successful! We'll confirm your session soon.", "success");
 
       setTimeout(() => {
         onClose();
@@ -205,7 +208,7 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
       }, 4000);
     } catch (error) {
       console.error('Booking error:', error);
-      notify("Failed to start plan. Please try again.", "error");
+      notify("Something went wrong with your booking. Please try again.", "error");
       setStep(1);
     }
   };
@@ -454,9 +457,9 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
       {/* Navigation */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl">
         <div className="liquid-glass px-8 py-3 rounded-2xl flex items-center justify-between shadow-lg shadow-blue-500/5">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30">
-              <Zap size={20} fill="white" className="text-white" />
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-slate-100 shadow-md transition-transform group-hover:scale-110">
+              <img src="/mrman_brand.png" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <span className="font-black tracking-tighter text-xl text-slate-900">Mr Man.</span>
           </Link>
@@ -558,9 +561,9 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
         
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-20 mb-24 relative z-10">
           <div className="space-y-8">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-600/40">
-                <Zap size={28} fill="white" className="text-white" />
+            <div className="flex items-center gap-4 group">
+              <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-emerald-500/30 shadow-xl shadow-emerald-500/10">
+                <img src="/mrman_brand.png" alt="Logo" className="w-full h-full object-cover" />
               </div>
               <span className="font-black tracking-tighter text-3xl text-white">Mr Man.</span>
             </div>

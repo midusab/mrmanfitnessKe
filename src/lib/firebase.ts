@@ -7,6 +7,7 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export enum OperationType {
   CREATE = 'create',
@@ -58,6 +59,7 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
+    // Explicitly wait for the auth state to settle
     return result.user;
   } catch (error) {
     console.error('Error signing in with Google:', error);

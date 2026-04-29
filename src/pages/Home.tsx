@@ -137,7 +137,7 @@ export default function HomePage() {
   };
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const heroImages = [
-    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80",
+    "/mrman_brand.png",
     "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80",
     "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&q=80",
     "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80"
@@ -457,19 +457,6 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* Pricing Tiers Section */}
-        <div className="mb-40" id="pricing">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-6">
-              Invest in Your Health
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {pricingTiers.map((tier, i) => (
-              <PricingCard key={i} tier={tier} delay={i * 0.1} />
-            ))}
-          </div>
-        </div>
 
         {/* Mindset: Internal Locus of Control */}
         <section className="mb-40">
@@ -480,12 +467,12 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="space-y-8"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-[10px] font-black text-blue-600 mb-6 rounded-full border border-blue-100 uppercase tracking-widest">
-               <Zap size={12} fill="currentColor" /> System Core 2.0
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-[10px] font-black text-emerald-600 mb-6 rounded-full border border-emerald-100 uppercase tracking-widest">
+               <ShieldCheck size={12} fill="currentColor" /> The Visionary
             </div>
               <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 leading-none">
-                Master Your <br/>
-                <span className="text-emerald-600">Internal Locus.</span>
+                Meet the <br/>
+                <span className="text-emerald-600">Founder.</span>
               </h2>
               <p className="text-xl text-slate-600 font-medium leading-relaxed max-w-lg">
                 At Mr Man Fitness, we believe performance is 20% mechanics and 80% agency. True evolution starts when you realize you aren't just reacting to your environment—you are engineering it.
@@ -520,11 +507,11 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="aspect-square rounded-[4rem] bg-slate-900 overflow-hidden relative group">
+              <div className="aspect-square rounded-[4rem] bg-slate-900 overflow-hidden relative group shadow-2xl shadow-emerald-900/20">
                 <img 
-                  src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800" 
-                  alt="Focused Athlete" 
-                  className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100"
+                  src="/mrman_brand.png" 
+                  alt="Mr Man Founder" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
                 <div className="absolute bottom-12 left-12 right-12 p-8 liquid-glass-emerald border-white/20 rounded-[2.5rem]">
