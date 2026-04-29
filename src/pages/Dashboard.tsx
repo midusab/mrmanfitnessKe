@@ -26,7 +26,7 @@ const DashboardPage = () => {
   const { user, profile, logOut, loading: authLoading } = useAuth();
   const { notify } = useNotification();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'profile' | 'bookings' | 'updates'>('overview');
+  const [activeTab, setActiveTab] = useState<'profile' | 'bookings' | 'updates'>('bookings');
   const [bookings, setBookings] = useState<any[]>([]);
   const [updates, setUpdates] = useState<any[]>([]);
   const [inquiries, setInquiries] = useState<any[]>([]);
@@ -215,10 +215,9 @@ const DashboardPage = () => {
 
               <div className="mt-10 space-y-2">
                 {[
-                  { id: 'overview', label: 'Overview', icon: Activity },
-                  { id: 'profile', label: 'Profile', icon: UserIcon },
-                  { id: 'bookings', label: 'Workouts', icon: Calendar },
-                  { id: 'updates', label: 'Updates', icon: Bell }
+                  { id: 'bookings', label: 'My Bookings', icon: Calendar },
+                  { id: 'updates', label: 'Inquiry Responses', icon: MessageSquare },
+                  { id: 'profile', label: 'Account Settings', icon: UserIcon },
                 ].map(tab => (
                   <button
                     key={tab.id}
@@ -249,81 +248,6 @@ const DashboardPage = () => {
 
           <div className="lg:col-span-3 space-y-8">
             <AnimatePresence mode="wait">
-              {activeTab === 'overview' && (
-                <motion.div
-                  key="overview"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="space-y-8"
-                >
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                      <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
-                        <Activity size={24} />
-                      </div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active Workouts</p>
-                      <h4 className="text-3xl font-black tracking-tighter text-slate-900">
-                        {bookings.filter(b => b.status === 'confirmed').length}
-                      </h4>
-                    </div>
-                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                      <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
-                        <Calendar size={24} />
-                      </div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Sessions</p>
-                      <h4 className="text-3xl font-black tracking-tighter text-slate-900">{bookings.length}</h4>
-                    </div>
-                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                      <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
-                        <ShieldCheck size={24} />
-                      </div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">System Health</p>
-                      <h4 className="text-3xl font-black tracking-tighter text-slate-900">Optimal</h4>
-                    </div>
-                  </div>
-
-                  <div className="liquid-glass border-slate-100 p-10 rounded-[3rem]">
-                    <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-8 flex items-center gap-3">
-                      <Bell className="text-emerald-600" size={24} /> Latest Updates
-                    </h3>
-
-                    {user?.email === 'bochieng228@gmail.com' && (
-                      <div className="mb-8 p-6 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Developer Simulation (Test Mode)</p>
-                        <div className="flex flex-wrap gap-4">
-                          <button 
-                            onClick={simulateUpdate}
-                            className="text-xs font-bold px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition-all flex items-center gap-2"
-                          >
-                            <Zap size={14} className="text-emerald-600" /> Post System Update
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="space-y-6">
-                      {updates.length > 0 ? updates.map(update => (
-                        <div key={update.id} className="p-6 bg-white rounded-3xl border border-slate-50 shadow-sm hover:shadow-md transition-all">
-                          <h5 className="font-black text-slate-800 mb-2">{update.title}</h5>
-                           <p className="text-slate-500 text-sm leading-relaxed">{update.content}</p>
-                          <div className="mt-4 flex items-center gap-4">
-                           <span className="text-[9px] font-black text-emerald-600 uppercase bg-emerald-50 px-2 py-1 rounded-md">
-                               {update.program_type || 'General'}
-                             </span>
-                             <span className="text-[9px] font-black text-slate-400 uppercase">
-                               {new Date(update.created_at).toLocaleDateString()}
-                             </span>
-                          </div>
-                        </div>
-                      )) : (
-                        <div className="text-center py-12 text-slate-400 font-medium">No system updates available.</div>
-                      )}
-                    </div>
-                  </div>
-
-                </motion.div>
-              )}
 
                {activeTab === 'profile' && (
                  <motion.div
@@ -552,69 +476,46 @@ const DashboardPage = () => {
                   className="liquid-glass border-slate-100 p-10 rounded-[3rem]"
                 >
                   <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-10 flex items-center gap-3">
-                    <Bell className="text-emerald-600" size={24} /> System & Personal Updates.
+                    <MessageSquare className="text-emerald-600" size={24} /> Inquiry Intelligence.
                   </h3>
                   
-                  <div className="space-y-12">
-                    {/* Inquiry Responses (Personal Updates) */}
-                    {inquiries.filter(i => i.status === 'responded').length > 0 && (
-                      <div className="space-y-6">
-                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Direct Intelligence</h4>
-                        {inquiries.filter(i => i.status === 'responded').map(inquiry => (
-                          <div key={inquiry.id} className="bg-white p-8 rounded-[2.5rem] border-2 border-emerald-100 shadow-xl shadow-emerald-900/5 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-1.5 h-full bg-emerald-500" />
-                            <div className="flex items-center gap-3 mb-6">
-                              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                                <MessageSquare size={18} />
-                              </div>
-                              <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Personal Response</p>
-                                <p className="text-sm font-bold text-slate-900">RE: Your Transformation Inquiry</p>
-                              </div>
+                  <div className="space-y-8">
+                    {/* Inquiry Responses */}
+                    {inquiries.filter(i => i.status === 'responded').length > 0 ? (
+                      inquiries.filter(i => i.status === 'responded').map(inquiry => (
+                        <div key={inquiry.id} className="bg-white p-8 rounded-[2.5rem] border-2 border-emerald-100 shadow-xl shadow-emerald-900/5 relative overflow-hidden">
+                          <div className="absolute top-0 right-0 w-1.5 h-full bg-emerald-500" />
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                              <MessageSquare size={18} />
                             </div>
-                            <div className="mb-6">
-                              <p className="text-xs text-slate-400 font-bold uppercase mb-2">Original Message</p>
-                              <p className="text-slate-600 font-medium italic bg-slate-50 p-4 rounded-xl border border-slate-100">"{inquiry.message}"</p>
-                            </div>
-                            <div className="bg-slate-900 p-6 rounded-2xl text-white shadow-lg">
-                              <div className="flex items-center gap-2 mb-3">
-                                <ShieldCheck size={14} className="text-emerald-400" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Official Protocol</span>
-                              </div>
-                              <p className="text-sm font-medium leading-relaxed">{inquiry.admin_response}</p>
-                            </div>
-                            <div className="mt-6 flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                               <span>Transmitted: {new Date(inquiry.responded_at).toLocaleString()}</span>
-                               <span className="text-emerald-500">Verified</span>
+                            <div>
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Personal Response</p>
+                              <p className="text-sm font-bold text-slate-900">RE: Your Transformation Inquiry</p>
                             </div>
                           </div>
-                        ))}
+                          <div className="mb-6">
+                            <p className="text-xs text-slate-400 font-bold uppercase mb-2">Original Message</p>
+                            <p className="text-slate-600 font-medium italic bg-slate-50 p-4 rounded-xl border border-slate-100">"{inquiry.message}"</p>
+                          </div>
+                          <div className="bg-slate-900 p-6 rounded-2xl text-white shadow-lg">
+                            <div className="flex items-center gap-2 mb-3">
+                              <ShieldCheck size={14} className="text-emerald-400" />
+                              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Official Protocol</span>
+                            </div>
+                            <p className="text-sm font-medium leading-relaxed">{inquiry.admin_response}</p>
+                          </div>
+                          <div className="mt-6 flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                             <span>Transmitted: {new Date(inquiry.responded_at).toLocaleString()}</span>
+                             <span className="text-emerald-500">Verified</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
+                        <p className="text-slate-400 font-bold">No inquiry responses detected.</p>
                       </div>
                     )}
-
-                    {/* System Updates */}
-                    <div className="space-y-6">
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Broadcast Intelligence</h4>
-                      {updates.length > 0 ? updates.map(update => (
-                        <div key={update.id} className="relative pl-10 before:absolute before:left-[19px] before:top-8 before:bottom-[-24px] before:w-px before:bg-slate-100 last:before:hidden">
-                          <div className="absolute left-0 top-0 w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center z-10 border border-blue-100">
-                            <Zap size={18} />
-                          </div>
-                          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all group">
-                            <h5 className="font-black text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">{update.title}</h5>
-                            <p className="text-slate-500 text-sm leading-relaxed mb-4">{update.content}</p>
-                            <div className="flex items-center gap-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                              <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded-md">{update.program_type || 'General'}</span>
-                              <span>{new Date(update.created_at).toLocaleString()}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )) : (
-                        <div className="text-center py-12 text-slate-400 font-medium bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
-                          No broadcast updates available.
-                        </div>
-                      )}
-                    </div>
                   </div>
                 </motion.div>
               )}
