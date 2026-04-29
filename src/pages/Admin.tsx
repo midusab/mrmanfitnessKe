@@ -307,7 +307,13 @@ const AdminPage = () => {
                       <div className="flex justify-between items-start mb-6">
                         <div>
                           <h5 className="font-black text-lg text-slate-800">{inquiry.name}</h5>
-                          <p className="text-blue-600 text-sm font-bold">{inquiry.email}</p>
+                          <div className="flex items-center gap-3">
+                            <p className="text-blue-600 text-sm font-bold">{inquiry.email}</p>
+                            <span className="w-1 h-1 bg-slate-300 rounded-full" />
+                            <span className={`text-[9px] font-black uppercase tracking-widest flex items-center gap-1 ${inquiry.user_id ? 'text-emerald-500' : 'text-slate-400'}`}>
+                              {inquiry.user_id ? <><ShieldCheck size={10} /> Account Linked</> : 'Guest User'}
+                            </span>
+                          </div>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
                           inquiry.status === 'responded' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'

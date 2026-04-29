@@ -605,6 +605,20 @@ export default function HomePage() {
                       <p className="text-xl font-bold text-slate-800">Milimani, Nakuru City</p>
                     </div>
                   </div>
+                  
+                  {!user && (
+                    <div className="p-6 bg-blue-50 rounded-2xl border border-blue-100 flex gap-4 items-start">
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-blue-600 shadow-sm shrink-0">
+                        <User size={18} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-blue-600 uppercase tracking-widest mb-1">Guest Mode</p>
+                        <p className="text-[10px] font-bold text-blue-500/80 leading-relaxed">
+                          Sign in to track your inquiry status and receive direct responses in your dashboard.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               
