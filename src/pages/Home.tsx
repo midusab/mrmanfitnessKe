@@ -306,6 +306,7 @@ export default function HomePage() {
               src={heroImages[currentImageIndex]}
               alt="Performance Background"
               fetchpriority={currentImageIndex === 0 ? "high" : "low"}
+              decoding="async"
               className="w-full h-full object-cover mix-blend-multiply"
               style={{ 
                 y: bgY,
@@ -420,16 +421,16 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 h-[600px]">
             <motion.div whileHover={{ scale: 0.98 }} className="col-span-2 row-span-2 rounded-[2rem] overflow-hidden relative group">
-              <img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" />
+              <img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=800&auto=format&fm=webp" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
             </motion.div>
             <motion.div whileHover={{ scale: 0.98 }} className="rounded-[2.5rem] overflow-hidden relative group">
-              <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" />
+              <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fm=webp" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
             </motion.div>
             <motion.div whileHover={{ scale: 0.98 }} className="rounded-[2.5rem] overflow-hidden relative group">
-              <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" />
+              <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fm=webp" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
             </motion.div>
             <motion.div whileHover={{ scale: 0.98 }} className="col-span-2 rounded-[2.5rem] overflow-hidden relative group">
-              <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" />
+              <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800&auto=format&fm=webp" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
             </motion.div>
           </div>
         </section>
