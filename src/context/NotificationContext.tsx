@@ -53,8 +53,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
               }}
               className="pointer-events-auto"
             >
-              <div className="liquid-glass p-0.5 border-white/50 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] rounded-[2.5rem] overflow-hidden group">
-                <div className="bg-white/30 backdrop-blur-3xl px-6 py-5 flex items-center gap-5 border border-white/60 rounded-[2.4rem] relative overflow-hidden">
+              <div className="liquid-glass p-0.5 border-white/50 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.15)] rounded-3xl overflow-hidden group">
+                <div className="bg-white/30 backdrop-blur-3xl px-5 py-3 flex items-center gap-4 border border-white/60 rounded-[1.4rem] relative overflow-hidden">
                   {/* Decorative Gradient Background */}
                   <div className={`absolute inset-0 opacity-10 transition-opacity group-hover:opacity-20 ${
                     n.type === 'success' ? 'bg-emerald-500' :
@@ -63,28 +63,28 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     'bg-blue-500'
                   }`} />
                   
-                  <div className={`relative z-10 p-3 rounded-2xl shrink-0 shadow-lg ${
+                  <div className={`relative z-10 p-2 rounded-xl shrink-0 shadow-lg ${
                     n.type === 'success' ? 'bg-emerald-500 text-white shadow-emerald-500/20' :
                     n.type === 'error' ? 'bg-rose-500 text-white shadow-rose-500/20' :
                     n.type === 'protocol' ? 'bg-slate-900 text-white shadow-slate-900/20' :
                     'bg-blue-600 text-white shadow-blue-600/20'
                   }`}>
-                    {n.type === 'success' && <CheckCircle size={20} />}
-                    {n.type === 'error' && <AlertCircle size={20} />}
-                    {n.type === 'protocol' && <Sparkles size={20} />}
-                    {n.type === 'info' && <Info size={20} />}
+                    {n.type === 'success' && <CheckCircle size={16} />}
+                    {n.type === 'error' && <AlertCircle size={16} />}
+                    {n.type === 'protocol' && <Sparkles size={16} />}
+                    {n.type === 'info' && <Info size={16} />}
                   </div>
                   
                   <div className="relative z-10 flex-1 min-w-0">
-                    <p className="text-sm font-bold text-slate-800 leading-snug">
+                    <p className="text-xs font-bold text-slate-800 leading-tight truncate">
                       {n.type === 'protocol' ? (
                         <ShinyText text={n.message} speed={3} className="!text-slate-800" />
                       ) : (
                         n.message
                       )}
                     </p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 opacity-60">
-                      {n.type === 'protocol' ? 'System Broadcast' : 'Notification'}
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest opacity-60">
+                      {n.type === 'protocol' ? 'Broadcast' : 'Alert'}
                     </p>
                   </div>
                   
