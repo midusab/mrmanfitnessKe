@@ -317,32 +317,35 @@ export default function HomePage() {
         </AnimatePresence>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 pt-40 pb-[var(--spacing-fluid-md)]">
+      <div className="max-w-7xl mx-auto px-6 pt-32 md:pt-48 pb-[var(--spacing-fluid-md)]">
         {/* Hero Section */}
-        <section className="relative mb-[var(--spacing-fluid-lg)]">
+        <section className="relative mb-[var(--spacing-fluid-lg)] flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full"
+            className="flex-1 text-center lg:text-left"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-[10px] font-black uppercase text-blue-600 mb-8 border border-blue-100 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-[10px] font-black uppercase text-blue-600 mb-8 border border-blue-100 shadow-sm mx-auto lg:mx-0">
               <Sparkles size={14} /> Mr Man Fitness • Nakuru Elite
             </div>
-          <h1 className="text-fluid-h1 font-black tracking-tighter leading-[0.75] mb-10 text-slate-900 uppercase">
-            Redefine <br/>
-            Your <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-blue-600 to-emerald-500">
-              Boundary.
-            </span>
-          </h1>
-          <p className="text-fluid-body text-slate-600 max-w-xl mb-12 leading-relaxed font-medium">
-            A scientific approach to peak human condition by Mr Man Fitness. Based in Nakuru, designed for those who demand excellence in every fiber of their being.
-          </p>
-            <div className="flex flex-col sm:flex-row gap-5">
+            
+            <h1 className="text-fluid-h1 font-black tracking-tighter leading-[0.8] mb-8 text-slate-900 uppercase">
+              Redefine <br/>
+              Your <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-blue-600 to-emerald-500">
+                Boundary.
+              </span>
+            </h1>
+            
+            <p className="text-fluid-body text-slate-600 max-w-xl mb-12 leading-relaxed font-medium mx-auto lg:mx-0">
+              A scientific approach to peak human condition by Mr Man Fitness. Based in Nakuru, designed for those who demand excellence in every fiber of their being.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <button 
                 onClick={handleBookingClick}
-                className="bg-blue-600 text-white px-8 md:px-12 py-5 md:py-6 rounded-2xl font-black text-xs md:text-sm transition-all shadow-2xl shadow-blue-600/30 hover:bg-blue-700 active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center gap-4"
+                className="bg-blue-600 text-white px-10 md:px-12 py-5 md:py-6 rounded-2xl font-black text-xs md:text-sm transition-all shadow-2xl shadow-blue-600/30 hover:bg-blue-700 active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center gap-4"
               >
                 Book Session <ChevronRight size={22} />
               </button>
