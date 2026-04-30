@@ -15,6 +15,27 @@ export default defineConfig(({mode}) => {
         '@': path.resolve(__dirname, '.'),
       },
     },
+    build: {
+      minify: 'esbuild',
+      cssMinify: true,
+      reportCompressedSize: false, // Speeds up build
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('lucide')) return 'vendor-icons';
+              if (id.includes('firebase') || id.includes('supabase')) return 'vendor-db';
+              if (id.includes('motion')) return 'vendor-animation';
+              return 'vendor';
+            }
+          }
+        }
+      }
+    },
+    esbuild: {
+      drop: mode === 'production' ? ['console', 'debugger'] : [],
+    },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
