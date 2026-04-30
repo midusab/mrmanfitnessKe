@@ -37,7 +37,7 @@ const StudioZone = ({ title, description, image, features, delay }: { title: str
       }`}>
         Zone Precision
       </div>
-      <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white mb-4 leading-none">{title}</h2>
+      <h2 className="text-[var(--text-fluid-h2)] font-black tracking-tighter text-white mb-4 leading-[0.8]">{title}</h2>
       <p className="text-slate-300 font-medium mb-8 max-w-xl leading-relaxed">
         {description}
       </p>
@@ -105,10 +105,10 @@ export default function StudioPage() {
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-[10px] font-black text-blue-600 mb-6 rounded-full border border-blue-200 uppercase tracking-widest">
            <MapPin size={12} /> Location Index 1.0
         </div>
-        <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 leading-[0.8] mb-8">
+        <h1 className="text-[var(--text-fluid-h1)] font-black tracking-tighter text-slate-900 leading-[0.8] mb-8">
           The <br/>Studio.
         </h1>
-        <p className="text-xl text-slate-500 font-medium max-w-2xl leading-relaxed">
+        <p className="text-[var(--text-fluid-body)] text-slate-500 font-medium max-w-2xl leading-relaxed">
           Based in Milimani, Nakuru. A private laboratory for human performance, designed for total focus and absolute physical engineering.
         </p>
       </motion.div>
@@ -158,7 +158,7 @@ export default function StudioPage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-[10px] font-black text-white mb-8 rounded-full">
             <Sparkles size={14} fill="white" /> Reservation Required
           </div>
-          <h2 className="text-4xl md:text-7xl font-black tracking-tighter text-slate-900 leading-none mb-8">Ready to enter <br/>the Sanctum?</h2>
+          <h2 className="text-[var(--text-fluid-h2)] font-black tracking-tighter text-slate-900 leading-[0.8] mb-8">Ready to enter <br/>the Sanctum?</h2>
           <p className="text-slate-600 font-medium max-w-xl mx-auto mb-12 leading-relaxed text-lg">
             We value privacy and focus. Studio visits are strictly by appointment to ensure every athlete has the optimal environment for their evolution.
           </p>
