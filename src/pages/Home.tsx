@@ -138,9 +138,9 @@ export default function HomePage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const heroImages = [
     "/mrman_brand.png",
-    "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80"
+    "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80&w=1200",
+    "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&q=80&w=1200",
+    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=1200"
   ];
 
   useEffect(() => {
@@ -163,13 +163,13 @@ export default function HomePage() {
       name: "Sharon Njeri",
       role: "Nakuru Tech Hub",
       quote: "The personalized attention is unmatched. Mr Man Fitness isn't just a gym; it's high-performance engineering for the body.",
-      image: "https://picsum.photos/seed/person1/100"
+      image: "https://picsum.photos/seed/person1/100?webp=1"
     },
     {
       name: "Brian Kiprono",
       role: "Professional Athlete",
       quote: "Training at 1,800m altitude with Mr Man's insights has pushed my endurance to levels I never thought possible.",
-      image: "https://picsum.photos/seed/person2/100"
+      image: "https://picsum.photos/seed/person2/100?webp=1"
     },
     {
       name: "Elena Wangui",
@@ -208,13 +208,13 @@ export default function HomePage() {
       title: "Optimizing Hypoxic Training at 1,800m Altitude",
       category: "Science",
       date: "Apr 22, 2026",
-      image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800"
+      image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=600&auto=format&fm=webp"
     },
     {
       title: "The Neuro-Metabolic Connection: Beyond Muscle",
       category: "Performance",
       date: "Apr 15, 2026",
-      image: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=800"
+      image: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=600&auto=format&fm=webp"
     },
     {
       title: "Rift Valley Fueling: Local Nutrition for Elite Cycles",
@@ -297,16 +297,22 @@ export default function HomePage() {
           <motion.div 
             key={currentImageIndex}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.04 }}
+            animate={{ opacity: 0.05 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 2, ease: "easeInOut" }}
-            className="absolute inset-0 bg-cover bg-center mix-blend-multiply transition-transform duration-1000"
-            style={{ 
-              backgroundImage: `url('${heroImages[currentImageIndex]}')`,
-              y: bgY,
-              scale 
-            }}
-          />
+            className="absolute inset-0"
+          >
+            <motion.img 
+              src={heroImages[currentImageIndex]}
+              alt="Performance Background"
+              fetchpriority={currentImageIndex === 0 ? "high" : "low"}
+              className="w-full h-full object-cover mix-blend-multiply"
+              style={{ 
+                y: bgY,
+                scale 
+              }}
+            />
+          </motion.div>
         </AnimatePresence>
       </div>
 
@@ -376,7 +382,7 @@ export default function HomePage() {
               </div>
               <p className="text-sm text-slate-500 font-medium leading-relaxed italic">"The altitude training in Nakuru combined with this tech is visionary."</p>
               <div className="flex items-center gap-3">
-                <img src="https://picsum.photos/seed/elite/100" alt="Client" className="w-10 h-10 rounded-full border-2 border-white shadow-md" />
+                <img src="https://picsum.photos/seed/elite/100?webp=1" alt="Client" className="w-10 h-10 rounded-full border-2 border-white shadow-md" loading="lazy" />
                 <p className="text-[10px] font-black text-slate-800">Dr. Kenneth R. <span className="text-emerald-500 opacity-50">— Surgeon</span></p>
               </div>
             </div>
