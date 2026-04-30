@@ -324,25 +324,25 @@ const AdminPage = () => {
                     </button>
                   </div>
                   {inquiries.length > 0 ? inquiries.map(inquiry => (
-                    <div key={inquiry.id} className="p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:border-blue-100 transition-colors">
-                      <div className="flex justify-between items-start mb-6">
-                        <div>
-                          <h5 className="font-black text-lg text-slate-800">{inquiry.name}</h5>
-                          <div className="flex items-center gap-3">
-                            <p className="text-blue-600 text-sm font-bold">{inquiry.email}</p>
-                            <span className="w-1 h-1 bg-slate-300 rounded-full" />
+                    <div key={inquiry.id} className="p-6 md:p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:border-blue-100 transition-colors overflow-hidden">
+                      <div className="flex flex-col sm:flex-row justify-between items-start mb-6 gap-4">
+                        <div className="max-w-full">
+                          <h5 className="font-black text-lg text-slate-800 truncate">{inquiry.name}</h5>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-blue-600 text-sm font-bold truncate">{inquiry.email}</p>
+                            <span className="hidden sm:block w-1 h-1 bg-slate-300 rounded-full" />
                             <span className={`text-[9px] font-black uppercase tracking-widest flex items-center gap-1 ${inquiry.user_id ? 'text-emerald-500' : 'text-slate-400'}`}>
-                              {inquiry.user_id ? <><ShieldCheck size={10} /> Account Linked</> : 'Guest User'}
+                              {inquiry.user_id ? <><ShieldCheck size={10} /> Linked</> : 'Guest'}
                             </span>
                           </div>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest whitespace-nowrap ${
                           inquiry.status === 'responded' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'
                         }`}>
                           {inquiry.status}
                         </span>
                       </div>
-                      <p className="bg-slate-50 p-6 rounded-2xl text-slate-600 font-medium leading-relaxed mb-6 italic">
+                      <p className="bg-slate-50 p-4 md:p-6 rounded-2xl text-slate-600 font-medium leading-relaxed mb-6 italic break-words">
                         "{inquiry.message}"
                       </p>
                       {inquiry.status === 'responded' ? (
@@ -361,14 +361,14 @@ const AdminPage = () => {
                         </div>
                       )}
 
-                      <div className="flex justify-between items-center">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                           Received: {new Date(inquiry.created_at).toLocaleString()}
                         </p>
                         {inquiry.status !== 'responded' && (
                           <button 
                             onClick={() => handleInquiryAction(inquiry.id, responseTexts[inquiry.id] || 'Understood. We are reviewing your request.')}
-                            className="bg-rose-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-700 transition-all shadow-xl shadow-rose-600/20 flex items-center gap-2"
+                            className="w-full sm:w-auto bg-rose-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-700 transition-all shadow-xl shadow-rose-600/20 flex items-center justify-center gap-2"
                           >
                             Dispatch Response <ArrowRight size={14} />
                           </button>

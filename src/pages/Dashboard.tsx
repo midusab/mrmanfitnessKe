@@ -473,7 +473,7 @@ const DashboardPage = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="liquid-glass border-slate-100 p-10 rounded-[3rem]"
+                  className="liquid-glass border-slate-100 p-6 md:p-10 rounded-[2.5rem]"
                 >
                   <h3 className="text-2xl font-black tracking-tighter text-slate-900 mb-10 flex items-center gap-3">
                     <MessageSquare className="text-emerald-600" size={24} /> Inquiry Intelligence.
@@ -483,7 +483,7 @@ const DashboardPage = () => {
                     {/* Inquiry Responses */}
                     {inquiries.filter(i => i.status === 'responded').length > 0 ? (
                       inquiries.filter(i => i.status === 'responded').map(inquiry => (
-                        <div key={inquiry.id} className="bg-white p-8 rounded-[2.5rem] border-2 border-emerald-100 shadow-xl shadow-emerald-900/5 relative overflow-hidden">
+                        <div key={inquiry.id} className="bg-white p-6 md:p-8 rounded-[2.5rem] border-2 border-emerald-100 shadow-xl shadow-emerald-900/5 relative overflow-hidden">
                           <div className="absolute top-0 right-0 w-1.5 h-full bg-emerald-500" />
                           <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -496,14 +496,14 @@ const DashboardPage = () => {
                           </div>
                           <div className="mb-6">
                             <p className="text-xs text-slate-400 font-bold uppercase mb-2">Original Message</p>
-                            <p className="text-slate-600 font-medium italic bg-slate-50 p-4 rounded-xl border border-slate-100">"{inquiry.message}"</p>
+                            <p className="text-slate-600 font-medium italic bg-slate-50 p-4 rounded-xl border border-slate-100 break-words">"{inquiry.message}"</p>
                           </div>
                           <div className="bg-slate-900 p-6 rounded-2xl text-white shadow-lg">
                             <div className="flex items-center gap-2 mb-3">
                               <ShieldCheck size={14} className="text-emerald-400" />
                               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Official Protocol</span>
                             </div>
-                            <p className="text-sm font-medium leading-relaxed">{inquiry.admin_response}</p>
+                            <p className="text-sm font-medium leading-relaxed break-words">{inquiry.admin_response}</p>
                           </div>
                           <div className="mt-6 flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-widest">
                              <span>Transmitted: {new Date(inquiry.responded_at).toLocaleString()}</span>
