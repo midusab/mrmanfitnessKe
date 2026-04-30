@@ -127,6 +127,14 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
             >
               Book Session
             </button>
+            {user && (
+              <Link 
+                to="/dashboard"
+                className="md:hidden w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-lg shadow-slate-900/10 shrink-0 mr-2"
+              >
+                <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=0D9488&color=fff`} alt="User" className="w-full h-full object-cover" />
+              </Link>
+            )}
             <button className="md:hidden text-slate-800 hover:text-emerald-600 transition-colors" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X /> : <Menu />}
             </button>
@@ -144,6 +152,22 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
             className="fixed inset-x-0 top-0 pt-24 p-6 z-40 bg-white/95 backdrop-blur-2xl md:hidden shadow-2xl"
           >
             <div className="flex flex-col gap-6">
+              {user && (
+                <Link 
+                  to="/dashboard"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl mb-2"
+                >
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-md shrink-0">
+                    <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=0D9488&color=fff`} alt="User" className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Active Profile</p>
+                    <p className="text-lg font-black text-slate-800 tracking-tighter">{profile?.display_name || user.displayName || user.email?.split('@')[0]}</p>
+                  </div>
+                  <ChevronRight size={18} className="ml-auto text-slate-300" />
+                </Link>
+              )}
               {navItems.map((item) => (
                 <Link 
                   key={item.name} 
