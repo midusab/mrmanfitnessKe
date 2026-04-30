@@ -149,7 +149,7 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
                   key={item.name} 
                   to={item.path} 
                   onClick={() => setIsMenuOpen(false)} 
-                  className="text-4xl md:text-5xl font-black tracking-tighter text-slate-800 outline-none focus-visible:text-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-xl py-2 active:bg-slate-50 transition-all"
+                  className="text-2xl md:text-3xl font-black tracking-tighter text-slate-800 outline-none focus-visible:text-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-xl py-2 active:bg-slate-50 transition-all"
                 >
                   {item.name}
                 </Link>
