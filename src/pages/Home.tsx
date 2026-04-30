@@ -335,7 +335,7 @@ export default function HomePage() {
                 Boundary.
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-600 max-w-xl mb-12 leading-relaxed font-medium">
+            <p className="text-[var(--text-fluid-body)] text-slate-600 max-w-xl mb-12 leading-relaxed font-medium">
               A scientific approach to peak human condition by Mr Man Fitness. Based in Nakuru, designed for those who demand excellence in every fiber of their being.
             </p>
             <div className="flex flex-col sm:flex-row gap-5">
