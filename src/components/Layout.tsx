@@ -120,6 +120,17 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }
   );
 };
 
+const InputField = ({ label, icon: Icon, children }: { label: string, icon: any, children: React.ReactNode }) => (
+  <div className="space-y-2 group">
+    <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest flex items-center gap-2 group-focus-within:text-blue-600 transition-colors">
+      <Icon size={12} className="text-slate-400 group-focus-within:text-blue-500" /> {label}
+    </label>
+    <div className="relative">
+      {children}
+    </div>
+  </div>
+);
+
 const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
   const { user, profile } = useAuth();
   const { notify } = useNotification();
@@ -150,16 +161,16 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
   ];
   const durations = ["4 Weeks (Initiation)", "8 Weeks (Standard)", "12 Weeks (Transformation)", "Ongoing (Elite)"];
 
-  // Sync profile data when modal opens
+  // Sync profile data when modal opens (only once or if empty)
   useEffect(() => {
     if (user && isOpen) {
       setFormData(prev => ({
         ...prev,
-        name: profile?.display_name || user.displayName || prev.name,
-        email: user.email || prev.email,
+        name: prev.name || profile?.display_name || user.displayName || '',
+        email: prev.email || user.email || '',
       }));
     }
-  }, [user, profile, isOpen]);
+  }, [user, isOpen]); // Removed profile from dependency to prevent overwrite while typing
 
   useEffect(() => {
     const checkBooking = async () => {
@@ -234,16 +245,6 @@ const BookingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
     }
   };
 
-  const InputField = ({ label, icon: Icon, children }: { label: string, icon: any, children: React.ReactNode }) => (
-    <div className="space-y-2 group">
-      <label className="text-[10px] font-black text-slate-400 pl-2 uppercase tracking-widest flex items-center gap-2 group-focus-within:text-blue-600 transition-colors">
-        <Icon size={12} className="text-slate-400 group-focus-within:text-blue-500" /> {label}
-      </label>
-      <div className="relative">
-        {children}
-      </div>
-    </div>
-  );
 
   return (
     <AnimatePresence>
@@ -569,7 +570,7 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
                   key={item.name} 
                   to={item.path} 
                   onClick={() => setIsMenuOpen(false)} 
-                  className="text-4xl font-black tracking-tighter text-slate-800 outline-none focus-visible:text-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-xl"
+                  className="text-4xl md:text-5xl font-black tracking-tighter text-slate-800 outline-none focus-visible:text-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-xl py-2 active:bg-slate-50 transition-all"
                 >
                   {item.name}
                 </Link>

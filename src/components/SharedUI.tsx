@@ -84,9 +84,9 @@ export const TestimonialCard = ({ name, quote, role, image, delay }: { name: str
     </div>
     <p className="text-slate-600 italic leading-relaxed font-medium">"{quote}"</p>
     
-    <div className="flex items-center justify-between mt-auto">
+      <div className="flex items-center justify-between mt-auto">
       <div className="flex items-center gap-4 group/author">
-        <img src={image} alt={name} className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-xl transition-transform group-hover/author:scale-110" />
+        <img src={image} alt={name} className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-xl transition-transform group-hover/author:scale-110" loading="lazy" />
         <div>
           <h4 className="font-bold text-slate-800 text-sm tracking-tight">{name}</h4>
           <p className="text-[10px] font-bold text-emerald-500 font-medium uppercase tracking-widest">{role}</p>
@@ -116,8 +116,8 @@ export const TransformationCard = ({ name, result, duration, beforeImg, afterImg
     transition={{ duration: 0.8, delay }}
     className="group relative h-[480px] rounded-3xl overflow-hidden liquid-glass border-emerald-100/50 shadow-2xl shadow-emerald-900/5 cursor-pointer"
   >
-    <img src={beforeImg} alt={`${name} before`} className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-1000 group-hover:opacity-0" />
-    <img src={afterImg} alt={`${name} after`} className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-1000 scale-110 group-hover:scale-100" />
+    <img src={beforeImg} alt={`${name} before`} className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-1000 group-hover:opacity-0" loading="lazy" />
+    <img src={afterImg} alt={`${name} after`} className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-1000 scale-110 group-hover:scale-100" loading="lazy" />
     <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/90 via-emerald-900/10 to-transparent pointer-events-none" />
     <div className="absolute top-8 left-8 flex flex-col gap-2">
       <div className="px-4 py-1.5 liquid-glass-emerald border-white/50 rounded-full text-[10px] font-black text-emerald-600 font-medium">
@@ -152,7 +152,7 @@ export const BlogCard = ({ title, category, date, image, delay }: { title: strin
     className="group liquid-glass rounded-xl overflow-hidden border-blue-50 hover:bg-blue-50/50 transition-all duration-500 cursor-pointer"
   >
     <div className="aspect-video overflow-hidden relative">
-      <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+      <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
       <div className="absolute top-4 left-4">
         <span className="px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[9px] font-black text-blue-600">{category}</span>
       </div>

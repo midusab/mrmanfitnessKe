@@ -310,9 +310,9 @@ export default function HomePage() {
         </AnimatePresence>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 pt-40 pb-20">
+      <div className="max-w-7xl mx-auto px-6 pt-40 pb-[var(--spacing-fluid-md)]">
         {/* Hero Section */}
-        <section className="relative mb-40">
+        <section className="relative mb-[var(--spacing-fluid-lg)]">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -322,7 +322,7 @@ export default function HomePage() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-[10px] font-black uppercase text-blue-600 mb-8 border border-blue-100 shadow-sm">
               <Sparkles size={14} /> Mr Man Fitness • Nakuru Elite
             </div>
-            <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-[0.85] mb-10 text-slate-900">
+            <h1 className="text-[var(--text-fluid-h1)] font-black tracking-tighter leading-[0.9] mb-10 text-slate-900">
               Redefine Your <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-blue-600 to-emerald-500">
                 Boundary.
@@ -384,7 +384,7 @@ export default function HomePage() {
         </section>
 
         {/* Quick Programs Access */}
-        <section className="mb-40" id="programs">
+        <section className="mb-[var(--spacing-fluid-lg)]" id="programs">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-[9px] font-black text-emerald-600 mb-6 rounded-full border border-emerald-100">
@@ -404,7 +404,7 @@ export default function HomePage() {
         </section>
 
         {/* Gallery Bento Grid */}
-        <section className="mb-40" id="studio">
+        <section className="mb-[var(--spacing-fluid-lg)]" id="studio">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-4">The Studio.</h2>
@@ -414,23 +414,23 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 h-[600px]">
             <motion.div whileHover={{ scale: 0.98 }} className="col-span-2 row-span-2 rounded-[2rem] overflow-hidden relative group">
-              <img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" />
+              <img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" />
             </motion.div>
             <motion.div whileHover={{ scale: 0.98 }} className="rounded-[2.5rem] overflow-hidden relative group">
-              <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" />
+              <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" />
             </motion.div>
             <motion.div whileHover={{ scale: 0.98 }} className="rounded-[2.5rem] overflow-hidden relative group">
-              <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" />
+              <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" />
             </motion.div>
             <motion.div whileHover={{ scale: 0.98 }} className="col-span-2 rounded-[2.5rem] overflow-hidden relative group">
-              <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" />
+              <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Studio" referrerPolicy="no-referrer" loading="lazy" />
             </motion.div>
           </div>
         </section>
 
 
         {/* Transformation Section */}
-        <section className="mb-40" id="transformation">
+        <section className="mb-[var(--spacing-fluid-lg)]" id="transformation">
           <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
             <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-800 leading-[0.9]">Transformations.</h2>
             <p className="max-w-xs text-slate-600 font-medium text-sm text-right">Real results, engineered for Nakuru's highest achievers.</p>
@@ -443,7 +443,7 @@ export default function HomePage() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="mb-40" id="testimonials">
+        <section className="mb-[var(--spacing-fluid-lg)]" id="testimonials">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-6">
               Voice of the Elite.
@@ -464,7 +464,7 @@ export default function HomePage() {
 
 
         {/* Mindset: Internal Locus of Control */}
-        <section className="mb-40">
+        <section className="mb-[var(--spacing-fluid-lg)]">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -548,7 +548,7 @@ export default function HomePage() {
         </section>
 
         {/* Pricing Tiers Section */}
-        <div className="mb-40" id="pricing">
+        <div className="mb-[var(--spacing-fluid-lg)]" id="pricing">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-6">
               Invest in Your Health
@@ -562,7 +562,7 @@ export default function HomePage() {
         </div>
 
         {/* Contact Section */}
-        <section className="mb-40" id="contact">
+        <section className="mb-[var(--spacing-fluid-lg)]" id="contact">
           <div className="liquid-glass p-8 md:p-20 rounded-[3rem] overflow-hidden relative border-slate-100/50">
             <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/5 blur-[100px] rounded-full -mr-48 -mt-48" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-600/5 blur-[100px] rounded-full -ml-48 -mb-48" />

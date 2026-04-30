@@ -3,6 +3,16 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  /* Fluid Spacing Scale */
+  --spacing-fluid-sm: clamp(1rem, 2vw, 1.5rem);
+  --spacing-fluid-md: clamp(2rem, 5vw, 4rem);
+  --spacing-fluid-lg: clamp(4rem, 10vw, 10rem);
+  
+  /* Fluid Typography */
+  --text-fluid-h1: clamp(2.5rem, 8vw, 8rem);
+  --text-fluid-h2: clamp(2rem, 5vw, 5rem);
+  --text-fluid-body: clamp(0.9rem, 1.1vw, 1.1rem);
 }
 
 @layer components {
